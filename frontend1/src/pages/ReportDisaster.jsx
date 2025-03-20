@@ -1,9 +1,7 @@
 import React from 'react'
 
-const ReportDisaster = () => {
+export function ReportDisaster () {
   return (
     <div>ReportDisaster</div>
   )
 }
-
-export default ReportDisaster

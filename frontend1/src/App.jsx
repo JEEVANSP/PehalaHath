@@ -4,6 +4,13 @@ import { useAuth } from './context/AuthProvider';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Register } from './pages/Register';
+import { Alerts } from './pages/Alerts';
+import { Chat } from './pages/Chat';
+import { EmergencyContacts } from './pages/EmergencyContacts';
+import { ReportDisaster } from './pages/ReportDisaster';
+import { Resources } from './pages/Resources';
+import { Settings } from './pages/Settings';
+import { Volunteers } from './pages/Volunteers';
 
 function App() {
   const { user } = useAuth();
@@ -14,6 +21,13 @@ function App() {
       <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       <Route path="/register" element={<Register/>}/>
+      <Route path="/alerts" element={<Alerts/>}/>
+      <Route path="/chat" element={<Chat/>}/>
+      <Route path="/emergency-contacts" element={<EmergencyContacts/>}/>
+      <Route path="/report-disaster" element={<ReportDisaster/>}/>
+      <Route path="/resources" element={<Resources/>}/>
+      <Route path="/settings" element={<Settings/>}/>
+      <Route path="/volunteers" element={<Volunteers/>}/>
     </Routes>
   );
 }

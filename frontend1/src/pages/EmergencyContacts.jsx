@@ -1,9 +1,7 @@
 import React from 'react'
 
-const EmergencyContacts = () => {
+export function EmergencyContacts () {
   return (
     <div>EmergencyContacts</div>
   )
 }
-
-export default EmergencyContacts
