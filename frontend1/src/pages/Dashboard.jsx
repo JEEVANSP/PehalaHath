@@ -6,9 +6,13 @@ import { AlertTriangle, Users, MessageSquare, Bell, ArrowRight, Menu, X, AlertCi
 import axios from 'axios';
 import { Sidebar } from '../components/Sidebar';
 
-
 const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
 const VITE_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+};
 
 const emergencyIncidents = [
   {
@@ -30,17 +34,66 @@ const emergencyIncidents = [
   // Add more mock incidents as needed
 ];
 
+// Map component separated to prevent reloading
+const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident }) => {
+  const [map, setMap] = useState(null);
+
+  const onLoad = React.useCallback((map) => {
+    const bounds = new window.google.maps.LatLngBounds();
+    emergencyIncidents.forEach(incident => {
+      bounds.extend(incident.location);
+    });
+    map.fitBounds(bounds);
+    setMap(map);
+  }, []);
+
+  const onUnmount = React.useCallback(() => {
+    setMap(null);
+  }, []);
+
+  return (
+    <GoogleMap
+      mapContainerStyle={mapContainerStyle}
+      center={{ lat: 20, lng: 0 }}
+      zoom={2}
+      onLoad={onLoad}
+      onUnmount={onUnmount}
+    >
+      {emergencyIncidents.map((incident) => (
+        <Marker
+          key={incident.id}
+          position={incident.location}
+          onClick={() => setSelectedIncident(incident)}
+        />
+      ))}
+      {selectedIncident && (
+        <InfoWindow
+          position={selectedIncident.location}
+          onCloseClick={() => setSelectedIncident(null)}
+        >
+          <div className="p-2">
+            <h3 className="font-semibold text-gray-900">{selectedIncident.title}</h3>
+            <p className="text-sm text-gray-600 mt-1">{selectedIncident.description}</p>
+            <div className="mt-2 flex justify-end">
+              <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                View Details
+              </button>
+            </div>
+          </div>
+        </InfoWindow>
+      )}
+    </GoogleMap>
+  );
+});
+
+// Wrap the entire app with LoadScript
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-
-  const mapContainerStyle = {
-    width: '100%',
-    height: '100%',
-  };
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -154,36 +207,20 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="h-[600px] relative">
-                <LoadScript googleMapsApiKey={VITE_GOOGLE_MAPS_API_KEY}>
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={{ lat: 20, lng: 0 }}
-                    zoom={2}
-                  >
-                    {emergencyIncidents.map((incident) => (
-                      <Marker
-                        key={incident.id}
-                        position={incident.location}
-                        onClick={() => setSelectedIncident(incident)}
-                      />
-                    ))}
-                    {selectedIncident && (
-                      <InfoWindow
-                        position={selectedIncident.location}
-                        onCloseClick={() => setSelectedIncident(null)}
-                      >
-                        <div className="p-2">
-                          <h3 className="font-semibold text-gray-900">{selectedIncident.title}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{selectedIncident.description}</p>
-                          <div className="mt-2 flex justify-end">
-                            <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                              View Details
-                            </button>
-                          </div>
-                        </div>
-                      </InfoWindow>
-                    )}
-                  </GoogleMap>
+                <LoadScript 
+                  googleMapsApiKey={VITE_GOOGLE_MAPS_API_KEY}
+                  onLoad={() => setIsMapLoaded(true)}
+                  loadingElement={
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-gray-500">Loading map...</div>
+                    </div>
+                  }
+                  preventGoogleFontsLoading={true}
+                >
+                  <EmergencyMap
+                    selectedIncident={selectedIncident}
+                    setSelectedIncident={setSelectedIncident}
+                  />
                 </LoadScript>
               </div>
             </div>

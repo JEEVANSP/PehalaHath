@@ -12,11 +12,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check localStorage for token on page refresh
     const token = localStorage.getItem('token');
+
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser({ token }); // Simulated user object
     }
   }, []);
+
+  useEffect(() => {
+    console.log("Updated user state:", user);
+  }, [user]);
 
   const login = (token) => {
     console.log(token)

@@ -20,12 +20,24 @@ export function Login() {
     const password = formData.get('password');
 
     try {
+      console.log('Attempting login with:', { email });
       const response = await axios.post(`${BACKEND_URL}/login`, { email, password });
-      login(response.data.token); // Store token & navigate
-      toast.success('Welcome back!');
+      console.log('Login response:', response.data);
+      
+      if (response.data && response.data.token) {
+        login(response.data.token);
+        toast.success('Welcome back!');
+      } else {
+        console.error('Invalid response format:', response.data);
+        toast.error('Server response format error');
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Invalid email or password');
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      toast.error(error.response?.data?.error || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

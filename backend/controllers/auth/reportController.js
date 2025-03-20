@@ -1,4 +1,4 @@
-import Report from '../models/Report.js'; // Import the Report model
+import Report from '../../config/models/report.js'; // Import the Report model
 
 // Submit a new report
 export const submitReport = async (req, res) => {
@@ -9,7 +9,7 @@ export const submitReport = async (req, res) => {
     const report = new Report({ type, title, description, location, severity, images });
     await report.save();
 
-    res.status(201).json({ message: 'Report submitted successfully', report });
+    res.status(200).json({ message: 'Report submitted successfully', report });
   } catch (error) {
     console.error('Error submitting report:', error);
     res.status(500).json({ error: 'Error submitting report' });

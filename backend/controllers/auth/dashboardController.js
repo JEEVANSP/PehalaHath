@@ -1,4 +1,4 @@
-export const getDashboardData = (req, res) => {
+const getDashboardData = (req, res) => {
     try {
       // Example: Fetch user data from the decoded token
       const user = req.user; // Retrieved from authMiddleware
@@ -16,4 +16,6 @@ export const getDashboardData = (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
     }
   };
+
+  export default getDashboardData;
   

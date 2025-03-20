@@ -1,15 +1,16 @@
 import express from 'express';
 import multer from 'multer';
-import { submitReport, getReports, getReportById, deleteReport } from '../controllers/reportController.js';
+import authMiddleware from '../../middleware/authMiddleware.js';
+import { submitReport, getReports, getReportById, deleteReport } from '../../controllers/auth/reportController.js';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
 // Route to submit a report (with image upload)
-router.post('/', upload.array('images'), submitReport);
+router.post('/submit-report', upload.array('images'), authMiddleware, submitReport);
 
 // Route to get all reports
-router.get('/', getReports);
+router.get('/get-report', getReports);
 
 // Route to get a single report by ID
 router.get('/:id', getReportById);

@@ -1,27 +1,10 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { useAuth } from "../context/AuthProvider";
 import { Bell, AlertTriangle, Filter, Search, MapPin, Calendar, ExternalLink } from 'lucide-react';
 
-const mockAlerts = [
-  {
-    id: '1',
-    title: 'Severe Flooding Event',
-    description: 'Major flooding reported in coastal areas.',
-    severity: 'critical',
-    timestamp: new Date().toISOString(),
-    location: 'New York, USA',
-    reported_by: 'Jane Smith'
-  },
-  {
-    id: '2',
-    title: 'Wildfire Spreading',
-    description: 'A wildfire is spreading near California forests.',
-    severity: 'high',
-    timestamp: new Date().toISOString(),
-    location: 'California, USA',
-    reported_by: 'John Doe'
-  }
-];
+
+const BACKEND_URL = "http://localhost:5000/api/auth/reports";
 
 export function Alerts() {
   const [alerts, setAlerts] = useState([]);
@@ -29,12 +12,29 @@ export function Alerts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState('all');
 
+  const {user} = useAuth();
+
   useEffect(() => {
     setTimeout(() => {
-      setAlerts(mockAlerts);
+      fetchReports();
       setLoading(false);
     }, 1000);
-  }, []);
+  }, [user]);
+
+  const fetchReports = async () => {
+    try {
+        console.log("user",user.token)
+      const response = await fetch(`${BACKEND_URL}/get-report`, {
+        headers: { "Authorization": `Bearer ${user?.token}` },
+      });
+      const data = await response.json();
+      console.log(data);
+      setAlerts(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      setAlerts([]);
+    }
+  };
 
   const getSeverityColor = (severity) => {
     switch (severity) {
@@ -90,7 +90,7 @@ export function Alerts() {
         <div className="grid gap-6 md:grid-cols-2">
           {filteredAlerts.map((alert) => (
             <div 
-              key={alert.id} 
+              key={alert._id} 
               className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-red-100"
             >
               <div className="flex justify-between items-start gap-4">
@@ -104,7 +104,7 @@ export function Alerts() {
                     <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                        {new Date(alert.timestamp).toLocaleString()}
+                        {new Date(alert.createdAt).toLocaleString()}
                       </div>
                       <div className="flex items-center">
                         <MapPin className="h-4 w-4 mr-2 text-gray-400" />
