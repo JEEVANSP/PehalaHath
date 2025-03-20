@@ -1,9 +1,7 @@
 import React from 'react'
 
-const Volunteers = () => {
+export function Volunteers () {
   return (
     <div>Volunteers</div>
   )
 }
-
-export default Volunteers
