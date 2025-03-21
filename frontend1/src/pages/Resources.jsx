@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Plus, Filter, Search, ArrowUpDown, X, Clock, Mail, User, AlertCircle, MapPin, Shield } from 'lucide-react';
+import { Package, Plus, Filter, Search, ArrowUpDown } from 'lucide-react';
 
 const mockResources = [
   {
@@ -44,18 +44,6 @@ export function Resources() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedResource, setSelectedResource] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleViewDetails = (resource) => {
-    setSelectedResource(resource);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedResource(null);
-  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -161,114 +149,15 @@ export function Resources() {
                   </span>
                 </div>
                 <div>
-                  <button 
-                    onClick={() => handleViewDetails(resource)}
-                    className="text-sm text-red-600 hover:text-red-900"
-                  >
-                    View Details
-                  </button>
+                  <button className="text-sm text-red-600 hover:text-red-900">View Details</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Resource Details Modal */}
-      {isModalOpen && selectedResource && (
-        <div 
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50"
-          onClick={handleCloseModal}
-        >
-          <div 
-            className="relative top-10 mx-auto p-6 border w-[500px] shadow-2xl rounded-xl bg-white/95 backdrop-blur-sm"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">{selectedResource.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">{selectedResource.category}</p>
-              </div>
-              <button
-                onClick={handleCloseModal}
-                className="text-gray-400 hover:text-gray-500 transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                  <div>
-                    <p className="text-xs text-gray-500">Urgency</p>
-                    <p className="text-sm font-medium text-gray-900 capitalize">{selectedResource.urgency}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                  <Package className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p className="text-xs text-gray-500">Quantity</p>
-                    <p className="text-sm font-medium text-gray-900">{selectedResource.quantity} {selectedResource.unit}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                <MapPin className="h-5 w-5 text-green-400" />
-                <div>
-                  <p className="text-xs text-gray-500">Location</p>
-                  <p className="text-sm font-medium text-gray-900">{selectedResource.location}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                <Clock className="h-5 w-5 text-purple-400" />
-                <div>
-                  <p className="text-xs text-gray-500">Added</p>
-                  <p className="text-sm font-medium text-gray-900">{new Date(selectedResource.timestamp).toLocaleString()}</p>
-                </div>
-              </div>
-              
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Description</p>
-                <p className="text-sm text-gray-900">{selectedResource.description}</p>
-              </div>
-              
-              <div className="border-t pt-5">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Provided By</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                    <User className="h-5 w-5 text-indigo-400" />
-                    <div>
-                      <p className="text-xs text-gray-500">Name</p>
-                      <p className="text-sm font-medium text-gray-900">{selectedResource.providedBy.name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                    <Mail className="h-5 w-5 text-orange-400" />
-                    <div>
-                      <p className="text-xs text-gray-500">Email</p>
-                      <p className="text-sm font-medium text-gray-900">{selectedResource.providedBy.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                    <Shield className="h-5 w-5 text-teal-400" />
-                    <div>
-                      <p className="text-xs text-gray-500">Role</p>
-                      <p className="text-sm font-medium text-gray-900 capitalize">{selectedResource.providedBy.role}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
-export default Resources;
 
+export default Resources;
