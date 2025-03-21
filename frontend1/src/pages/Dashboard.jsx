@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthProvider';
-import { useNavigate,Link } from 'react-router-dom';
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import { AlertTriangle, Users, MessageSquare, Bell, ArrowRight, Menu, X, AlertCircle, Phone, FileText, Box, Settings, Heart, LogOut } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { AlertTriangle, Users, MessageSquare, Bell } from 'lucide-react';
 import axios from 'axios';
 import { Sidebar } from '../components/Sidebar';
 
@@ -86,18 +86,27 @@ const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident }) => {
   );
 });
 
-// Wrap the entire app with LoadScript
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  
+  // Use the hook from @react-google-maps/api instead of LoadScript
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: VITE_GOOGLE_MAPS_API_KEY,
+    preventGoogleFontsLoading: true
+  });
+
+  const handleClick = () => {
+    navigate("/report-disaster");
+  };
 
   useEffect(() => {
     if (!user) {
-      navigate('/login'); // Redirect if not logged in
+      navigate('/login');
       return;
     }
 
@@ -105,11 +114,11 @@ export function Dashboard() {
       .then(res => setDashboardData(res.data))
       .catch(err => {
         console.error("Dashboard fetch error:", err);
-        logout(); // If token invalid, log out
+        logout();
       });
   }, [user, navigate, logout]);
 
-  if (!user) return null; // Prevents flashing
+  if (!user) return null;
 
   return (
     <div className="h-full flex">
@@ -200,28 +209,23 @@ export function Dashboard() {
               <div className="p-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">Emergency Incident Map</h2>
-                  <button className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700">
+                  <button onClick={handleClick} className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700">
                     <AlertTriangle className="h-4 w-4 mr-2" />
                     Report Incident
                   </button>
                 </div>
               </div>
               <div className="h-[600px] relative">
-                <LoadScript 
-                  googleMapsApiKey={VITE_GOOGLE_MAPS_API_KEY}
-                  onLoad={() => setIsMapLoaded(true)}
-                  loadingElement={
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-gray-500">Loading map...</div>
-                    </div>
-                  }
-                  preventGoogleFontsLoading={true}
-                >
+                {isLoaded ? (
                   <EmergencyMap
                     selectedIncident={selectedIncident}
                     setSelectedIncident={setSelectedIncident}
                   />
-                </LoadScript>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-gray-500">Loading map...</div>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -1,18 +1,43 @@
 import Report from '../../config/models/report.js'; // Import the Report model
+import cloudinary from '../../config/cloudinary.js';
 
 // Submit a new report
 export const submitReport = async (req, res) => {
   try {
     const { type, title, description, location, severity } = req.body;
-    const images = req.files ? req.files.map(file => file.path) : [];
+    const images = [];
 
-    const report = new Report({ type, title, description, location, severity, images });
+    // Handle image uploads if files are present
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Convert buffer to base64 string for Cloudinary upload
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = `data:${file.mimetype};base64,${b64}`;
+        
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(dataURI, {
+          folder: 'reports',
+          resource_type: 'auto'
+        });
+        images.push(result.secure_url);
+      }
+    }
+
+    // Create and save report with all required fields
+    const report = new Report({
+      type,
+      title,
+      description,
+      location,
+      severity,
+      images
+    });
     await report.save();
 
     res.status(200).json({ message: 'Report submitted successfully', report });
   } catch (error) {
     console.error('Error submitting report:', error);
-    res.status(500).json({ error: 'Error submitting report' });
+    res.status(500).json({ error: error.message || 'Error submitting report' });
   }
 };
 

@@ -13,15 +13,15 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     { icon: <Phone size={20} />, label: 'Emergency Contacts', path: '/emergency-contacts' },
     { icon: <AlertCircle size={20} />, label: 'Report Disaster', path: '/report-disaster' },
     { icon: <Box size={20} />, label: 'Resources', path: '/resources' },
-    { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
     { icon: <Heart size={20} />, label: 'Volunteers', path: '/volunteers' },
+    { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
   ];
 
   return (
     <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-all duration-300 z-50 
       ${isSidebarOpen ? 'w-64' : 'w-18'}`}>
       <div className="p-4 flex items-center justify-between border-b">
-        {isSidebarOpen && <h2 className="text-xl font-bold text-gray-800">Menu</h2>}
+        {isSidebarOpen && <h2 className="text-xl font-bold text-gray-800">PehlaHath</h2>}
         <button
           onClick={() => setSidebarOpen(!isSidebarOpen)}
           className="p-2 hover:bg-gray-100 rounded-lg"
