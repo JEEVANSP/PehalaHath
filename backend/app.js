@@ -5,6 +5,7 @@ import routes from './routes/routes.js';
 import connectDB from './config/connect.js';
 import mongoose from 'mongoose';
 import emergencyRoutes from './routes/emergency.js';
+import volunteerRoutes from './routes/volunteers.js';
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGODBURL)
 
 // Routes
 app.use('/api/emergency', emergencyRoutes);
+app.use('/api/volunteers',volunteerRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

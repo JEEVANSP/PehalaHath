@@ -12,11 +12,14 @@ import { Resources } from './pages/Resources';
 import { Settings } from './pages/Settings';
 import { Volunteers } from './pages/Volunteers';
 import {Layout} from './components/Layout';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { user } = useAuth();
 
   return (
+    <>
+    <Toaster position='top-right'/>
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
       <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
@@ -32,6 +35,7 @@ function App() {
       <Route path="/volunteers" element={<Volunteers/>}/>
       </Route>
     </Routes>
+    </>
   );
 }
 
