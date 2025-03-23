@@ -7,45 +7,130 @@ import axios from 'axios';
 import { Sidebar } from '../components/Sidebar';
 
 const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
+const ALERTS_URL = "http://localhost:5000/api/auth/reports";
 const VITE_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+// Add this function to get marker icon based on severity
+// Update the getMarkerIcon function to handle undefined google object
+const getMarkerIcon = (severity) => {
+  if (!window.google) return null;
+
+  const baseConfig = {
+    path: window.google.maps.SymbolPath.CIRCLE,
+    scale: 10,
+    strokeWeight: 2,
+    fillOpacity: 1
+  };
+
+  switch (severity) {
+    case 'critical':
+      return { ...baseConfig, fillColor: '#EF4444', strokeColor: '#B91C1C' };
+    case 'high':
+      return { ...baseConfig, fillColor: '#F97316', strokeColor: '#C2410C' };
+    case 'medium':
+      return { ...baseConfig, fillColor: '#FBBF24', strokeColor: '#B45309' };
+    case 'low':
+      return { ...baseConfig, fillColor: '#34D399', strokeColor: '#047857' };
+    default:
+      return { ...baseConfig, fillColor: '#9CA3AF', strokeColor: '#4B5563' };
+  }
+};
 
 const mapContainerStyle = {
   width: '100%',
   height: '100%',
 };
 
-const emergencyIncidents = [
-  {
-    id: '1',
-    type: 'flood',
-    title: 'Severe Flooding Event',
-    description: 'Major flooding reported in coastal areas',
-    location: { lat: 40.7128, lng: -74.0060 },
-    severity: 'high',
-    timestamp: new Date().toISOString(),
-    reportedBy: {
-      id: '1',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'emergency_responder'
-    },
-    status: 'active'
-  },
-  // Add more mock incidents as needed
-];
-
 // Map component separated to prevent reloading
-const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident }) => {
+// Add geocodeAddress function at the top with other utility functions
+const geocodeAddress = async (address) => {
+  try {
+    const geocoder = new window.google.maps.Geocoder();
+    const result = await new Promise((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK') {
+          resolve(results[0].geometry.location);
+        } else {
+          reject(new Error(`Geocoding failed: ${status}`));
+        }
+      });
+    });
+    return {
+      lat: result.lat(),
+      lng: result.lng()
+    };
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    return null;
+  }
+};
+
+// Update the EmergencyMap component to include geocoding
+const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident, location, alerts }) => {
   const [map, setMap] = useState(null);
+  const [geocodedAlerts, setGeocodedAlerts] = useState([]);
+  const [isApiReady, setIsApiReady] = useState(false);
+
+  // Add an effect to check if Google Maps API is ready
+  useEffect(() => {
+    if (window.google && window.google.maps) {
+      setIsApiReady(true);
+    }
+  }, []);
+
+  // Update the geocoding effect to wait for API and alerts
+  useEffect(() => {
+    const geocodeAlerts = async () => {
+      console.log('Starting geocoding process...', { isApiReady, alertsLength: alerts.length });
+      if (!isApiReady || !alerts.length) return;
+
+      try {
+        const geocoded = await Promise.all(
+          alerts.map(async (alert) => {
+            console.log('Processing alert:', alert);
+            if (alert.location.includes(',')) {
+              const [lat, lng] = alert.location.split(',').map(coord => parseFloat(coord.trim()));
+              return { ...alert, coordinates: { lat, lng } };
+            } else {
+              const coordinates = await geocodeAddress(alert.location);
+              console.log('Geocoded coordinates for', alert.location, ':', coordinates);
+              return { ...alert, coordinates };
+            }
+          })
+        );
+        const validAlerts = geocoded.filter(alert => alert.coordinates);
+        console.log('Processed alerts:', validAlerts);
+        setGeocodedAlerts(validAlerts);
+      } catch (error) {
+        console.error('Error during geocoding:', error);
+      }
+    };
+
+    geocodeAlerts();
+  }, [alerts, isApiReady]);
 
   const onLoad = React.useCallback((map) => {
     const bounds = new window.google.maps.LatLngBounds();
-    emergencyIncidents.forEach(incident => {
-      bounds.extend(incident.location);
+    
+    if (location) {
+      bounds.extend(new window.google.maps.LatLng(location.latitude, location.longitude));
+    }
+
+    // Add alert locations to bounds
+    alerts.forEach(alert => {
+      // Parse location string to coordinates (assuming format: "lat,lng")
+      const [lat, lng] = alert.location.split(',').map(coord => parseFloat(coord.trim()));
+      if (!isNaN(lat) && !isNaN(lng)) {
+        bounds.extend(new window.google.maps.LatLng(lat, lng));
+      }
     });
-    map.fitBounds(bounds);
+
+    if (location || alerts.length > 0) {
+      map.fitBounds(bounds);
+    }
+
     setMap(map);
-  }, []);
+  }, [location, alerts]);
 
   const onUnmount = React.useCallback(() => {
     setMap(null);
@@ -54,30 +139,37 @@ const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident }) => {
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
-      center={{ lat: 20, lng: 0 }}
-      zoom={2}
+      center={location ? { lat: location.latitude, lng: location.longitude } : { lat: 20, lng: 0 }}
+      zoom={location ? 10 : 2}
       onLoad={onLoad}
       onUnmount={onUnmount}
     >
-      {emergencyIncidents.map((incident) => (
+      {location && (
+        <Marker 
+          position={{ lat: location.latitude, lng: location.longitude }} 
+          label="You" 
+        />
+      )}
+      
+      {geocodedAlerts.map((alert) => (
         <Marker
-          key={incident.id}
-          position={incident.location}
-          onClick={() => setSelectedIncident(incident)}
+          key={alert._id}
+          position={alert.coordinates}
+          onClick={() => setSelectedIncident(alert)}
+          icon={getMarkerIcon(alert.severity)}
         />
       ))}
-      {selectedIncident && (
+
+      {selectedIncident && selectedIncident.coordinates && (
         <InfoWindow
-          position={selectedIncident.location}
+          position={selectedIncident.coordinates}
           onCloseClick={() => setSelectedIncident(null)}
         >
           <div className="p-2">
             <h3 className="font-semibold text-gray-900">{selectedIncident.title}</h3>
             <p className="text-sm text-gray-600 mt-1">{selectedIncident.description}</p>
-            <div className="mt-2 flex justify-end">
-              <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                View Details
-              </button>
+            <div className="mt-2">
+              <span className="text-xs font-medium text-gray-500">Severity: {selectedIncident.severity}</span>
             </div>
           </div>
         </InfoWindow>
@@ -86,39 +178,87 @@ const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident }) => {
   );
 });
 
+
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: VITE_GOOGLE_MAPS_API_KEY
+  });
+
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  
-  // Use the hook from @react-google-maps/api instead of LoadScript
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: VITE_GOOGLE_MAPS_API_KEY,
-    preventGoogleFontsLoading: true
-  });
+  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [alerts, setAlerts] = useState([]);
 
+  // Add handleClick function definition
   const handleClick = () => {
     navigate("/report-disaster");
   };
 
+  // Add this useEffect to fetch alerts
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    const fetchAlerts = async () => {
+      try {
+        const response = await axios.get(ALERTS_URL + '/get-report', {
+          headers: { Authorization: `Bearer ${user?.token}` }
+        });
+        console.log("Raw response data:", response.data);
+        const alertsData = Array.isArray(response.data) ? response.data : 
+                         response.data.reports ? response.data.reports : [];
+        console.log("Processed alerts data:", alertsData);
+        setAlerts(alertsData);
+      } catch (error) {
+        console.error('Error fetching alerts:', error);
+      }
+    };
+
+    if (user?.token) {
+      fetchAlerts();
     }
+  }, [user]);
 
-    axios.get(BACKEND_URL)
-      .then(res => setDashboardData(res.data))
-      .catch(err => {
-        console.error("Dashboard fetch error:", err);
-        logout();
-      });
-  }, [user, navigate, logout]);
+  // Add this effect to monitor alerts state changes
+  useEffect(() => {
+    console.log("Current alerts state:", alerts);
+  }, [alerts]);
 
+  // Move the early return after all useEffect declarations
   if (!user) return null;
+
+  useEffect(() => {
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          setLocation(userLocation);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setError('Unable to get your location. Please enable location services.');
+          setLoading(false);
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by your browser');
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (location) {
+      console.log("User location:", location); // This will run only when location updates
+    }
+  }, [location]);
 
   return (
     <div className="h-full flex">
@@ -220,6 +360,8 @@ export function Dashboard() {
                   <EmergencyMap
                     selectedIncident={selectedIncident}
                     setSelectedIncident={setSelectedIncident}
+                    location={location}
+                    alerts={alerts} // Add this line
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
