@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";

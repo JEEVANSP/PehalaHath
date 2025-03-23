@@ -80,6 +80,7 @@ export function Volunteers() {
       });
 
       const result = await response.json();
+      console.log("Response from backend:", result);
 
       if (response.ok) {
         toast.success("You have successfully volunteered for this task!");
