@@ -135,38 +135,39 @@ export function ReportDisaster() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-gradient-to-r from-red-600 to-red-500 rounded-t-2xl shadow-lg p-8">
-          <div className="flex items-center space-x-4">
-            <div className="bg-white/20 p-3 rounded-full">
-              <AlertTriangle className="h-8 w-8 text-white" />
+        {/* Enhanced Header Section */}
+        <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-400 rounded-t-3xl shadow-2xl p-10">
+          <div className="flex items-center space-x-6">
+            <div className="bg-white/20 p-4 rounded-full shadow-inner">
+              <AlertTriangle className="h-10 w-10 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-4xl font-bold text-white tracking-tight">
                 Report Emergency
               </h1>
-              <p className="mt-2 text-red-100">
+              <p className="mt-3 text-lg text-red-50 opacity-90">
                 Your report helps save lives. Please provide accurate details.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Form Section */}
-        <div className="bg-white rounded-b-2xl shadow-lg p-8">
+        {/* Enhanced Form Section */}
+        <div className="bg-white rounded-b-3xl shadow-2xl p-10">
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Type and Severity Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 block">
                   Emergency Type
                 </label>
                 <select
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
-                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 transition-colors"
+                  className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
                 >
                   <option value="">Select Type</option>
                   <option value="earthquake">Earthquake</option>
@@ -176,15 +177,15 @@ export function ReportDisaster() {
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 block">
                   Severity Level
                 </label>
                 <select
                   name="severity"
                   value={formData.severity}
                   onChange={handleChange}
-                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 transition-colors"
+                  className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
                 >
                   <option value="">Select Severity</option>
                   <option value="low" className="text-green-600">
@@ -203,8 +204,9 @@ export function ReportDisaster() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700">
+            {/* Title Input */}
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 block">
                 Title
               </label>
               <input
@@ -212,13 +214,14 @@ export function ReportDisaster() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 transition-colors"
+                className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
                 placeholder="Brief title of the emergency"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700">
+            {/* Description Textarea */}
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 block">
                 Description
               </label>
               <textarea
@@ -226,17 +229,18 @@ export function ReportDisaster() {
                 rows={4}
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 transition-colors"
+                className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
                 placeholder="Detailed description of the situation"
               ></textarea>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700">
+            {/* Location Input */}
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 block">
                 Location
               </label>
-              <div className="flex rounded-lg shadow-sm">
-                <span className="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+              <div className="flex rounded-xl shadow-sm overflow-hidden">
+                <span className="inline-flex items-center px-4 border border-r-0 border-gray-200 bg-gray-50 text-gray-500">
                   <MapPin className="h-5 w-5 text-red-500" />
                 </span>
                 {isLoaded ? (
@@ -252,14 +256,14 @@ export function ReportDisaster() {
                       types: ["geocode"],
                     }}
                     defaultValue={formData.location}
-                    className="flex-1 rounded-r-lg border-gray-300 focus:border-red-500 focus:ring-red-500 transition-colors"
+                    className="flex-1 rounded-r-xl border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
                     style={{ width: "100%" }}
                     placeholder="Search for a location"
                   />
                 ) : (
                   <input
                     type="text"
-                    className="flex-1 rounded-r-lg border-gray-300 focus:border-red-500 focus:ring-red-500 transition-colors"
+                    className="flex-1 rounded-r-xl border-gray-200"
                     placeholder="Loading location search..."
                     disabled
                   />
@@ -267,16 +271,20 @@ export function ReportDisaster() {
               </div>
             </div>
 
+            {/* Image Upload Section */}
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-gray-700 block">
                 Upload Images
               </label>
               <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-red-100 border-dashed rounded-xl cursor-pointer bg-red-50/30 hover:bg-red-50/50 transition-colors">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Camera className="w-10 h-10 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-500">
+                    <Camera className="w-12 h-12 text-red-400" />
+                    <p className="mt-3 text-sm text-red-500 font-medium">
                       Click or drag images here
+                    </p>
+                    <p className="mt-1 text-xs text-red-400">
+                      Supported formats: JPG, PNG, GIF
                     </p>
                   </div>
                   <input
@@ -288,15 +296,17 @@ export function ReportDisaster() {
                   />
                 </label>
               </div>
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+
+              {/* Image Preview Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
                 {imagePreview.map((src, index) => (
-                  <div key={index} className="relative group">
+                  <div key={index} className="relative group rounded-xl overflow-hidden">
                     <img
                       src={src}
-                      className="h-24 w-full object-cover rounded-lg shadow-md"
+                      className="h-24 w-full object-cover transition-transform group-hover:scale-110"
                       alt={`Preview ${index + 1}`}
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                       <button
                         type="button"
                         onClick={() => {
@@ -305,9 +315,9 @@ export function ReportDisaster() {
                           );
                           setImagePreview(newPreviews);
                         }}
-                        className="text-white hover:text-red-500"
+                        className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
                       >
-                        <X className="h-6 w-6" />
+                        <X className="h-5 w-5 text-white" />
                       </button>
                     </div>
                   </div>
@@ -315,14 +325,15 @@ export function ReportDisaster() {
               </div>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3 px-4 bg-gradient-to-r ${
+              className={`w-full py-4 px-6 bg-gradient-to-r ${
                 isSubmitting
                   ? "from-gray-400 to-gray-500 cursor-not-allowed"
                   : "from-red-600 to-red-500 hover:from-red-700 hover:to-red-600"
-              } text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 font-semibold shadow-lg flex items-center justify-center space-x-2`}
+              } text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-semibold shadow-xl flex items-center justify-center space-x-3`}
             >
               {isSubmitting ? (
                 <>
@@ -350,7 +361,7 @@ export function ReportDisaster() {
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="h-5 w-5" />
+                  <AlertTriangle className="h-6 w-6" />
                   <span>Submit Emergency Report</span>
                 </>
               )}

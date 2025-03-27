@@ -2,62 +2,49 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
-const emergencyContext = `You are a compassionate and knowledgeable emergency assistance AI. Your role is to provide helpful, accurate, and appropriate responses in a natural, conversational manner. While maintaining professionalism, you should:
+// Updated context to be more focused on emergency responses
+const emergencyContext = `You are an emergency assistance AI expert. Focus on:
+- Providing immediate, actionable emergency guidance
+- Giving clear safety instructions
+- Sharing relevant emergency contact numbers
+- Offering first aid advice when needed
+- Helping with disaster preparedness
+- Maintaining calm, clear communication
 
-1. Respond naturally and conversationally, as if talking to a friend
-2. Show empathy and understanding in your responses
-3. Provide clear, actionable advice without being overly formal
-4. Use a friendly, supportive tone while maintaining seriousness for emergencies
-5. Ask follow-up questions when needed to better understand the situation
-6. Share relevant information in a way that's easy to understand
-7. Be direct but caring in emergency situations
-8. Use simple language and avoid technical jargon
-9. Show concern for the user's safety and well-being
-10. Maintain context throughout the conversation
+Current supported emergencies: floods, earthquakes, fires, medical emergencies, and natural disasters.`;
 
-Remember to:
-- Be human-like in your responses
-- Show genuine care and concern
-- Keep responses concise but informative
-- Use natural language patterns
-- Be supportive and encouraging
-- Maintain appropriate seriousness for emergencies
-- Ask clarifying questions when needed
-- Provide practical, actionable advice`;
-
-export const getAIResponse = async (userInput) => {
+export const getAIResponse = async (userInput, conversationHistory) => {
   try {
     if (!import.meta.env.VITE_GEMINI_API_KEY) {
       console.error('Gemini API key is not configured');
       return getFallbackResponse(userInput);
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
     
-    const prompt = `${emergencyContext}\n\nUser Query: ${userInput}\n\nProvide a natural, conversational response that shows empathy and understanding. If it's an emergency, be direct but caring. For general queries, be helpful and supportive. Always maintain a human-like tone while providing accurate information.\n\nAssistant:`;
-    
-    console.log('Sending request to Gemini API...');
+    // Updated prompt structure for the latest API version
+    const prompt = `${emergencyContext}\n\nConversation History:\n${conversationHistory}\n\nUser Message: ${userInput}\n\nProvide a clear, helpful response focusing on emergency guidance if needed. Be direct and practical.`;
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
     
-    console.log('Received response from Gemini API');
-    
-    // Clean up the response while maintaining natural language
-    const cleanedResponse = text
-      .replace(/Assistant:/g, '')
-      .replace(/^\s+|\s+$/g, '')
-      .replace(/\n{3,}/g, '\n\n')
-      .replace(/^I am an AI assistant/i, '')
-      .replace(/^As an AI assistant/i, '')
-      .replace(/^I am an emergency assistance AI/i, '')
-      .replace(/^As an emergency assistance AI/i, '');
-    
-    if (!cleanedResponse.trim()) {
+    if (!response || !response.text) {
+      console.error('Empty response from Gemini API');
       return getFallbackResponse(userInput);
     }
+
+    const text = response.text();
     
-    return cleanedResponse;
+    // Enhanced response cleaning
+    const cleanedResponse = text
+      .replace(/AI:|Assistant:|Emergency AI:/gi, '')
+      .replace(/^\s+|\s+$/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\*\*/g, '') // Remove asterisks while keeping the text bold
+      .replace(/\*([^*]+)\*/g, '$1') // Remove single asterisks
+      .trim();
+
+    return cleanedResponse || getFallbackResponse(userInput);
   } catch (error) {
     console.error('Error getting AI response:', error);
     return getFallbackResponse(userInput);
@@ -188,21 +175,3 @@ const getEmergencyNumber = (location, type) => {
   }
   return '112'; // Universal emergency number
 };
-
-const getEmergencyNumbers = (location) => {
-  if (!location) {
-    return `• Universal Emergency: 112\n• US/Canada: 911\n• UK: 999\n• Australia: 000\n• India: 100 (Police), 101 (Fire), 108 (Ambulance)\n• Japan: 110 (Police), 119 (Ambulance/Fire)`;
-  }
-
-  const numbers = {
-    'India': '• Police: 100\n• Fire & Rescue: 101\n• Ambulance: 108\n• Women Helpline: 1091\n• Child Helpline: 1098',
-    'United States': '• Emergency Services: 911',
-    'United Kingdom': '• Emergency Services: 999',
-    'Australia': '• Emergency Services: 000',
-    'Canada': '• Emergency Services: 911',
-    'Japan': '• Police: 110\n• Ambulance/Fire: 119',
-    'European Union': '• Emergency Services: 112'
-  };
-
-  return numbers[location] || numbers['India'];
-}; 
