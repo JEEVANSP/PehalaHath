@@ -76,3 +76,23 @@ export const getUserResourceRequests = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteAllocatedResource = async (req,res) => {
+  try {
+    const {userId, resourceId} = req.params;
+    const resource = await Resource.findOne({
+      _id: resourceId,
+      'providedBy.id': userId,
+      status: 'allocated'
+    });
+    if(!resource){
+      return res.status(404).json({
+        message: 'Resource not found or not allocated'
+      });
+    }
+    await Resource.findByIdAndDelete(resourceId);
+    res.json({message: 'Resource deleted successfully'});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};

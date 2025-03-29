@@ -88,4 +88,23 @@ export const backendService = {
       throw error;
     }
   },
+
+  deleteAllocatedResource: async (userId,resourceId,token) => {
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/resources/${userId}/${resourceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      throw error;
+    }
+  }
 };
+

@@ -4,7 +4,8 @@ import {
   createResourceRequest,
   updateResourceStatus,
   getUserResourceRequests,
-  updateResourceAllocation
+  updateResourceAllocation,
+  deleteAllocatedResource
 } from '../controllers/auth/resourceController.js';
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.patch('/resources/:userId/:resourceId/allocate', updateResourceAllocation
 
 // Get user's resource requests
 router.get('/resources/user/:userId', getUserResourceRequests);
+
+router.delete('/resources/:userId/:resourceId',deleteAllocatedResource)
 
 export default router;
