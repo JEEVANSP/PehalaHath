@@ -110,7 +110,7 @@ export function Resources() {
   }, []);
   */
 
-  const handleMarkAsAllocated = async (resourceId) => {
+  const handleMarkAsAllocated = async (userId,resourceId) => {
     try {
       // First check if user is authenticated
       if (!user || !user.token) {
@@ -118,7 +118,7 @@ export function Resources() {
         return;
       }
 
-      await backendService.updateResourceAllocation(resourceId, user.token);
+      await backendService.updateResourceAllocation(userId, resourceId,user.token);
       toast.success("Resource marked as allocated");
       
       // Reload both resources lists
@@ -195,7 +195,7 @@ export function Resources() {
             </div>
             {resource.status === 'requested' && (
               <button
-                onClick={() => handleMarkAsAllocated(resource.providedBy.id)}
+                onClick={() => handleMarkAsAllocated(resource.providedBy.id,resource._id)}
                 className="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
               >
                 Mark as Allocated

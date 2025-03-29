@@ -19,7 +19,7 @@ router.post('/resources', createResourceRequest);
 router.patch('/resources/:id', updateResourceStatus);
 
 // Mark resource as allocated
-router.patch('/resources/:id/allocate', updateResourceAllocation);
+router.patch('/resources/:userId/:resourceId/allocate', updateResourceAllocation);
 
 // Get user's resource requests
 router.get('/resources/user/:userId', getUserResourceRequests);

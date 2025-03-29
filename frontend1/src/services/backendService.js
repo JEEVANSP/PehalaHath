@@ -68,10 +68,12 @@ export const backendService = {
   },
 
   // Update resource allocation status
-  updateResourceAllocation: async (resourceId, token) => {
+  updateResourceAllocation: async (userId,resourceId,token) => {
     try {
+      console.log("resourceId",resourceId);
+      console.log("userId",userId);
       const response = await axios.patch(
-        `${API_BASE_URL}/resources/${resourceId}/allocate`,
+        `${API_BASE_URL}/resources/${userId}/${resourceId}/allocate`,
         { status: 'allocated' },
         {
           headers: {

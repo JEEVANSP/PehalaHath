@@ -43,8 +43,8 @@ export const updateResourceStatus = async (req, res) => {
 // Update resource allocation status
 export const updateResourceAllocation = async (req, res) => {
   try {
-    const { id } = req.params;
-    const resource = await Resource.findOne({ 'providedBy.id': id });
+    const { userId,resourceId } = req.params;
+    const resource = await Resource.findOne({_id: resourceId, 'providedBy.id': userId });
     console.log(resource);
     if (!resource) {
       return res.status(404).json({ message: 'Resource not found' });
