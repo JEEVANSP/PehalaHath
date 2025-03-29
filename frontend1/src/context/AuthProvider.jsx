@@ -2,6 +2,7 @@ import React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode'; // Import all exports from jwt-decode
 
 const AuthContext = createContext();
 
@@ -12,18 +13,58 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check localStorage for token on page refresh
     const token = localStorage.getItem('token');
+
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser({ token }); // Simulated user object
+      try {
+        // Decode the JWT token to get user data including role
+        const decoded = jwtDecode(token);
+        
+        // Set axios default headers
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        // Set user state with token and decoded data
+        setUser({ 
+          token,
+          id: decoded.id,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role
+        });
+      } catch (error) {
+        console.error("Invalid token:", error);
+        localStorage.removeItem('token');
+      }
     }
   }, []);
 
+  useEffect(() => {
+    console.log("Updated user state:", user);
+  }, [user]);
+
   const login = (token) => {
-    console.log(token)
-    localStorage.setItem('token', token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setUser({ token });
-    navigate('/'); // Redirect after login
+    try {
+      // Decode the JWT token
+      const decoded = jwtDecode(token);
+      
+      // Store token in localStorage
+      localStorage.setItem('token', token);
+      
+      // Set axios default headers
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      // Set user state with token and decoded data
+      setUser({
+        token,
+        id: decoded.id,
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role
+      });
+      
+      navigate('/'); // Redirect after login
+    } catch (error) {
+      console.error("Error processing login token:", error);
+    }
   };
 
   const logout = () => {

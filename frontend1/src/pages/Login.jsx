@@ -20,25 +20,37 @@ export function Login() {
     const password = formData.get('password');
 
     try {
+      console.log('Attempting login with:', { email });
       const response = await axios.post(`${BACKEND_URL}/login`, { email, password });
-      login(response.data.token); // Store token & navigate
-      toast.success('Welcome back!');
+      console.log('Login response:', response.data);
+      
+      if (response.data && response.data.token) {
+        login(response.data.token);
+        toast.success('Welcome back!');
+      } else {
+        console.error('Invalid response format:', response.data);
+        toast.error('Server response format error');
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Invalid email or password');
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      toast.error(error.response?.data?.error || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <AlertTriangle className="h-12 w-12 text-red-600" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to DisasterWatch
+          Sign in to <span className="text-red-500">PehlaHath</span>
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}

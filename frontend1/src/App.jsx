@@ -11,16 +11,21 @@ import { ReportDisaster } from './pages/ReportDisaster';
 import { Resources } from './pages/Resources';
 import { Settings } from './pages/Settings';
 import { Volunteers } from './pages/Volunteers';
+import {Layout} from './components/Layout';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { user } = useAuth();
 
   return (
+    <>
+    <Toaster position='top-right'/>
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
       <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       <Route path="/register" element={<Register/>}/>
+      <Route element={<Layout />}>
       <Route path="/alerts" element={<Alerts/>}/>
       <Route path="/chat" element={<Chat/>}/>
       <Route path="/emergency-contacts" element={<EmergencyContacts/>}/>
@@ -28,7 +33,9 @@ function App() {
       <Route path="/resources" element={<Resources/>}/>
       <Route path="/settings" element={<Settings/>}/>
       <Route path="/volunteers" element={<Volunteers/>}/>
+      </Route>
     </Routes>
+    </>
   );
 }
 
