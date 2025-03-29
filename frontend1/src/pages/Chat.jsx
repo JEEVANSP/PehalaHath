@@ -102,22 +102,22 @@ export const Chat = () => {
   return (
     <div className={`flex flex-col h-[calc(100vh-4rem)] ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Chat Header */}
-      <div className={`bg-white border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} p-4`}>
+      <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} p-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <Bot className={`h-6 w-6 ${isDarkMode ? 'text-white' : 'text-blue-600'}`} />
+            <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-blue-100'} p-2 rounded-lg`}>
+              <Bot className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
             </div>
             <div>
               <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emergency Assistant</h2>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>24/7 AI-powered emergency support</p>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>24/7 AI-powered emergency support</p>
             </div>
           </div>
           <button
             onClick={clearChatHistory}
             className={`px-3 py-1 rounded-lg text-sm ${
               isDarkMode 
-                ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -137,19 +137,19 @@ export const Chat = () => {
               className={`max-w-[80%] rounded-lg p-3 ${
                 message.type === 'user'
                   ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-                  : isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900 border border-gray-200'
+                  : isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-900 border border-gray-200'
               }`}
             >
               <div className="flex items-start space-x-2">
                 {message.type === 'bot' && (
-                  <div className="bg-blue-100 p-1 rounded-full">
-                    <Bot className={`h-4 w-4 ${isDarkMode ? 'text-white' : 'text-blue-600'}`} />
+                  <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-blue-100'} p-1 rounded-full`}>
+                    <Bot className={`h-4 w-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                   </div>
                 )}
                 <div>
                   <div>
                     <p className="text-sm whitespace-pre-line">{message.content}</p>
-                    <p className="text-xs mt-1 opacity-70">
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </p>
                   </div>
@@ -161,11 +161,11 @@ export const Chat = () => {
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex items-start space-x-2">
-              <div className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                <Bot className={`h-5 w-5 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} />
+              <div className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                <Bot className={`h-5 w-5 ${isDarkMode ? 'text-blue-400' : 'text-gray-900'}`} />
               </div>
-              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
-                <Loader2 className={`h-5 w-5 animate-spin ${isDarkMode ? 'text-white' : 'text-gray-900'}`} />
+              <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <Loader2 className={`h-5 w-5 animate-spin ${isDarkMode ? 'text-blue-400' : 'text-gray-900'}`} />
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export const Chat = () => {
       </div>
 
       {/* Chat Input */}
-      <form onSubmit={handleSubmit} className={`bg-white border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} p-4`}>
+      <form onSubmit={handleSubmit} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} p-4`}>
         <div className="flex space-x-2">
           <input
             type="text"
