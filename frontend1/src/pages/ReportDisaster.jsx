@@ -4,11 +4,13 @@ import { useAuth } from "../context/AuthProvider";
 import Autocomplete from "react-google-autocomplete";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { GOOGLE_MAPS_CONFIG } from '../utils/googleMapsConfig';
+import { useThemeStore } from '../store/theme';
 
 const BACKEND_URL = "http://localhost:5000/api/auth/reports";
 const VITE_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export function ReportDisaster() {
+  const { isDarkMode } = useThemeStore();
   const [formData, setFormData] = useState({
     type: "",
     title: "",
@@ -128,46 +130,53 @@ export function ReportDisaster() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDarkMode ? 'border-white' : 'border-red-600'}`}></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'} py-12 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-4xl mx-auto">
         {/* Enhanced Header Section */}
-        <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-400 rounded-t-3xl shadow-2xl p-10">
-          <div className="flex items-center space-x-6">
-            <div className="bg-white/20 p-4 rounded-full shadow-inner">
-              <AlertTriangle className="h-10 w-10 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white tracking-tight">
-                Report Emergency
-              </h1>
-              <p className="mt-3 text-lg text-red-50 opacity-90">
-                Your report helps save lives. Please provide accurate details.
-              </p>
+        <div className={`relative overflow-hidden rounded-t-3xl shadow-2xl p-10 ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-red-600 via-red-500 to-red-400'}`}>
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+          <div className="relative z-10">
+            <div className="flex items-center space-x-6">
+              <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-white/20'} p-4 rounded-full shadow-inner`}>
+                <AlertTriangle className={`h-10 w-10 ${isDarkMode ? 'text-red-400' : 'text-white'}`} />
+              </div>
+              <div>
+                <h1 className={`text-4xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-white'}`}>
+                  Report Emergency
+                </h1>
+                <p className={`mt-3 text-lg ${isDarkMode ? 'text-gray-300' : 'text-red-50'} opacity-90`}>
+                  Your report helps save lives. Please provide accurate details.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Enhanced Form Section */}
-        <div className="bg-white rounded-b-3xl shadow-2xl p-10">
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-b-3xl shadow-2xl p-10 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Type and Severity Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-700 block">
+                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Emergency Type
                 </label>
                 <select
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
+                  className={`w-full rounded-xl shadow-sm transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
+                      : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
+                  }`}
                 >
                   <option value="">Select Type</option>
                   <option value="earthquake">Earthquake</option>
@@ -178,35 +187,31 @@ export function ReportDisaster() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-700 block">
+                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Severity Level
                 </label>
                 <select
                   name="severity"
                   value={formData.severity}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
+                  className={`w-full rounded-xl shadow-sm transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
+                      : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
+                  }`}
                 >
                   <option value="">Select Severity</option>
-                  <option value="low" className="text-green-600">
-                    Low
-                  </option>
-                  <option value="medium" className="text-yellow-600">
-                    Medium
-                  </option>
-                  <option value="high" className="text-orange-600">
-                    High
-                  </option>
-                  <option value="critical" className="text-red-600">
-                    Critical
-                  </option>
+                  <option value="low" className="text-green-600">Low</option>
+                  <option value="medium" className="text-yellow-600">Medium</option>
+                  <option value="high" className="text-orange-600">High</option>
+                  <option value="critical" className="text-red-600">Critical</option>
                 </select>
               </div>
             </div>
 
             {/* Title Input */}
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-gray-700 block">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Title
               </label>
               <input
@@ -214,14 +219,18 @@ export function ReportDisaster() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
+                className={`w-full rounded-xl shadow-sm transition-colors ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
+                    : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
+                }`}
                 placeholder="Brief title of the emergency"
               />
             </div>
 
             {/* Description Textarea */}
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-gray-700 block">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Description
               </label>
               <textarea
@@ -229,19 +238,25 @@ export function ReportDisaster() {
                 rows={4}
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full rounded-xl border-gray-200 shadow-sm hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
+                className={`w-full rounded-xl shadow-sm transition-colors ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
+                    : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
+                }`}
                 placeholder="Detailed description of the situation"
               ></textarea>
             </div>
 
             {/* Location Input */}
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-gray-700 block">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Location
               </label>
               <div className="flex rounded-xl shadow-sm overflow-hidden">
-                <span className="inline-flex items-center px-4 border border-r-0 border-gray-200 bg-gray-50 text-gray-500">
-                  <MapPin className="h-5 w-5 text-red-500" />
+                <span className={`inline-flex items-center px-4 border border-r-0 ${
+                  isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                }`}>
+                  <MapPin className={`h-5 w-5 ${isDarkMode ? 'text-red-400' : 'text-red-500'}`} />
                 </span>
                 {isLoaded ? (
                   <Autocomplete
@@ -256,14 +271,22 @@ export function ReportDisaster() {
                       types: ["geocode"],
                     }}
                     defaultValue={formData.location}
-                    className="flex-1 rounded-r-xl border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50 transition-colors"
+                    className={`flex-1 rounded-r-xl transition-colors ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
+                        : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
+                    }`}
                     style={{ width: "100%" }}
                     placeholder="Search for a location"
                   />
                 ) : (
                   <input
                     type="text"
-                    className="flex-1 rounded-r-xl border-gray-200"
+                    className={`flex-1 rounded-r-xl ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'border-gray-200'
+                    }`}
                     placeholder="Loading location search..."
                     disabled
                   />
@@ -273,17 +296,21 @@ export function ReportDisaster() {
 
             {/* Image Upload Section */}
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-gray-700 block">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Upload Images
               </label>
               <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-red-100 border-dashed rounded-xl cursor-pointer bg-red-50/30 hover:bg-red-50/50 transition-colors">
+                <label className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                  isDarkMode 
+                    ? 'border-red-900 bg-gray-700/50 hover:bg-gray-700' 
+                    : 'border-red-100 bg-red-50/30 hover:bg-red-50/50'
+                }`}>
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Camera className="w-12 h-12 text-red-400" />
-                    <p className="mt-3 text-sm text-red-500 font-medium">
+                    <Camera className={`w-12 h-12 ${isDarkMode ? 'text-red-400' : 'text-red-400'}`} />
+                    <p className={`mt-3 text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-500'}`}>
                       Click or drag images here
                     </p>
-                    <p className="mt-1 text-xs text-red-400">
+                    <p className={`mt-1 text-xs ${isDarkMode ? 'text-red-400' : 'text-red-400'}`}>
                       Supported formats: JPG, PNG, GIF
                     </p>
                   </div>
@@ -329,11 +356,15 @@ export function ReportDisaster() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-4 px-6 bg-gradient-to-r ${
+              className={`w-full py-4 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-semibold shadow-xl flex items-center justify-center space-x-3 ${
                 isSubmitting
-                  ? "from-gray-400 to-gray-500 cursor-not-allowed"
-                  : "from-red-600 to-red-500 hover:from-red-700 hover:to-red-600"
-              } text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-semibold shadow-xl flex items-center justify-center space-x-3`}
+                  ? isDarkMode 
+                    ? 'bg-gray-700 cursor-not-allowed' 
+                    : 'bg-gray-400 cursor-not-allowed'
+                  : isDarkMode
+                    ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+                    : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+              } text-white`}
             >
               {isSubmitting ? (
                 <>
@@ -372,3 +403,5 @@ export function ReportDisaster() {
     </div>
   );
 }
+
+export default ReportDisaster;

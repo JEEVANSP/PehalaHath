@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MapPin, Shield, AlertTriangle, Search, Clock, Globe, Navigation, Flame, Ambulance } from 'lucide-react';
 import axios from 'axios';
+import { useThemeStore } from '../store/theme';
 
 // Function to get address from coordinates
 const getAddressFromCoordinates = async (latitude, longitude) => {
@@ -142,6 +143,7 @@ export function EmergencyContacts() {
   const [emergencyCenters, setEmergencyCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isDarkMode } = useThemeStore();
 
   useEffect(() => {
     getUserLocation(setLocation, setLoading, setError);
@@ -171,222 +173,264 @@ export function EmergencyContacts() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">Emergency Contacts</h1>
-        <div className="relative w-full sm:w-auto">
-          <input
-            type="text"
-            placeholder="Search contacts..."
-            className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
-      </div>
-
-      {/* Add User Location Display */}
-      {location && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6">
-          <div className="flex items-center space-x-4">
-            <div className="bg-blue-100 p-3 rounded-lg flex-shrink-0">
-              <MapPin className="h-6 w-6 text-blue-600" />
-            </div>
+    <div className="space-y-8">
+      {/* Header Section with Gradient */}
+      <div className={`relative overflow-hidden rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-blue-500 to-blue-600'} p-8 text-white`}>
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-blue-900">Your Location</h2>
-              <p className="text-blue-700 text-sm sm:text-base">{location.address}</p>
-              <p className="text-blue-600 text-xs mt-1">
-                Coordinates: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
-              </p>
+              <h1 className="text-4xl font-bold mb-2">Emergency Contacts</h1>
+              <p className="text-blue-100">Quick access to emergency services and nearby help</p>
             </div>
-          </div>
-        </div>
-      )}
-
-      <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
-        <div className="flex items-center space-x-4">
-          <div className="bg-red-100 p-3 rounded-lg flex-shrink-0">
-            <AlertTriangle className="h-6 w-6 text-red-600" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-red-900">Emergency Guidelines</h2>
-            <p className="text-red-700 text-sm sm:text-base">Stay calm and provide clear information about your location and situation</p>
+            <div className="relative w-full sm:w-auto">
+              <input
+                type="text"
+                placeholder="Search contacts..."
+                className={`w-full sm:w-64 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    : 'bg-white bg-opacity-20 border-white border-opacity-30 text-white placeholder-blue-100'
+                }`}
+              />
+              <Search className="absolute left-3 top-3.5 h-5 w-5 text-blue-100" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6 space-y-4">
-          <div className="flex items-start space-x-4">
-            <div className="bg-blue-100 p-3 rounded-lg flex-shrink-0">
-              <Shield className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">Police Emergency</h3>
-              <p className="text-gray-600 text-sm">For immediate police assistance</p>
+      {/* Location and Guidelines Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {location && (
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'} p-6`}>
+              <div className="flex items-center space-x-4">
+                <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-blue-100'} p-3 rounded-xl`}>
+                  <MapPin className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                </div>
+                <div>
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-blue-900'}`}>Your Location</h2>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-700'}`}>{location.address}</p>
+                  <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-blue-600'}`}>
+                    Coordinates: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Availability: 24/7</span>
-            <span>Response: &lt; 5 mins</span>
-          </div>
-          <a
-            href="tel:100"
-            className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition group"
-          >
-            <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
-            <span className="font-semibold">100</span>
-          </a>
-        </div>
+        )}
 
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6 space-y-4">
-          <div className="flex items-start space-x-4">
-            <div className="bg-red-100 p-3 rounded-lg flex-shrink-0">
-              <Flame className="h-6 w-6 text-red-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">Fire & Rescue</h3>
-              <p className="text-gray-600 text-sm">For fire emergencies and rescue operations</p>
-            </div>
-          </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Availability: 24/7</span>
-            <span>Response: &lt; 5 mins</span>
-          </div>
-          <a
-            href="tel:101"
-            className="flex items-center justify-center w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition group"
-          >
-            <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
-            <span className="font-semibold">101</span>
-          </a>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6 space-y-4">
-          <div className="flex items-start space-x-4">
-            <div className="bg-green-100 p-3 rounded-lg flex-shrink-0">
-              <Ambulance className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">Ambulance Service</h3>
-              <p className="text-gray-600 text-sm">For emergency medical assistance</p>
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-red-50'} p-6`}>
+            <div className="flex items-center space-x-4">
+              <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-3 rounded-xl`}>
+                <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+              </div>
+              <div>
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-red-900'}`}>Emergency Guidelines</h2>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-red-700'}`}>Stay calm and provide clear information about your location and situation</p>
+              </div>
             </div>
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Availability: 24/7</span>
-            <span>Response: &lt; 5 mins</span>
-          </div>
-          <a
-            href="tel:108"
-            className="flex items-center justify-center w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition group"
-          >
-            <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
-            <span className="font-semibold">108</span>
-          </a>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-          <h2 className="text-xl font-semibold mb-4">Nearest Emergency Centers</h2>
-          {loading ? (
-            <div className="text-center py-4">
-              <p className="text-gray-600">Loading nearby emergency centers...</p>
+      {/* Emergency Services Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'} transform hover:scale-105 transition-transform duration-200`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'} p-6`}>
+            <div className="flex items-start space-x-4">
+              <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-blue-100'} p-3 rounded-xl`}>
+                <Shield className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-blue-900'} truncate`}>Police Emergency</h3>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-700'}`}>For immediate police assistance</p>
+              </div>
             </div>
-          ) : location ? (
-            <div className="space-y-4">
-              {Array.isArray(emergencyCenters) && emergencyCenters.length > 0 ? (
-                emergencyCenters.map((center, index) => (
-                  <div key={index} className="bg-white rounded-lg p-4 border border-gray-100 hover:border-blue-100 transition-all duration-200">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-3">
-                        <div className={`p-2 rounded-lg ${
-                          center.type === 'Hospital' ? 'bg-green-100' :
-                          center.type === 'Police Station' ? 'bg-blue-100' :
-                          'bg-red-100'
-                        }`}>
-                          {center.type === 'Hospital' ? <Ambulance className="h-5 w-5 text-green-600" /> :
-                           center.type === 'Police Station' ? <Shield className="h-5 w-5 text-blue-600" /> :
-                           <Flame className="h-5 w-5 text-red-600" />}
+          </div>
+          <div className="p-6 space-y-4">
+            <div className={`flex justify-between text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span>Availability: 24/7</span>
+              <span>Response: &lt; 5 mins</span>
+            </div>
+            <a
+              href="tel:100"
+              className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition group shadow-md hover:shadow-lg"
+            >
+              <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+              <span className="font-semibold">100</span>
+            </a>
+          </div>
+        </div>
+
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'} transform hover:scale-105 transition-transform duration-200`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-red-50'} p-6`}>
+            <div className="flex items-start space-x-4">
+              <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-3 rounded-xl`}>
+                <Flame className={`h-6 w-6 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-red-900'} truncate`}>Fire & Rescue</h3>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-red-700'}`}>For fire emergencies and rescue operations</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className={`flex justify-between text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span>Availability: 24/7</span>
+              <span>Response: &lt; 5 mins</span>
+            </div>
+            <a
+              href="tel:101"
+              className="flex items-center justify-center w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition group shadow-md hover:shadow-lg"
+            >
+              <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+              <span className="font-semibold">101</span>
+            </a>
+          </div>
+        </div>
+
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'} transform hover:scale-105 transition-transform duration-200`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-green-50'} p-6`}>
+            <div className="flex items-start space-x-4">
+              <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-green-100'} p-3 rounded-xl`}>
+                <Ambulance className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-green-900'} truncate`}>Ambulance Service</h3>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-green-700'}`}>For emergency medical assistance</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className={`flex justify-between text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span>Availability: 24/7</span>
+              <span>Response: &lt; 5 mins</span>
+            </div>
+            <a
+              href="tel:108"
+              className="flex items-center justify-center w-full px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition group shadow-md hover:shadow-lg"
+            >
+              <Phone className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+              <span className="font-semibold">108</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Emergency Centers and Tips Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Nearest Emergency Centers</h2>
+          </div>
+          <div className="p-6">
+            {loading ? (
+              <div className="text-center py-4">
+                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Loading nearby emergency centers...</p>
+              </div>
+            ) : location ? (
+              <div className="space-y-4">
+                {Array.isArray(emergencyCenters) && emergencyCenters.length > 0 ? (
+                  emergencyCenters.map((center, index) => (
+                    <div key={index} className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl p-4 border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'} hover:border-blue-100 transition-all duration-200`}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3">
+                          <div className={`p-2 rounded-lg ${
+                            center.type === 'Hospital' ? isDarkMode ? 'bg-gray-600' : 'bg-green-100' :
+                            center.type === 'Police Station' ? isDarkMode ? 'bg-gray-600' : 'bg-blue-100' :
+                            isDarkMode ? 'bg-gray-600' : 'bg-red-100'
+                          }`}>
+                            {center.type === 'Hospital' ? <Ambulance className={`h-5 w-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} /> :
+                             center.type === 'Police Station' ? <Shield className={`h-5 w-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} /> :
+                             <Flame className={`h-5 w-5 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />}
+                          </div>
+                          <div>
+                            <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{extractEnglishName(center.display_name)}</h3>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{center.type || 'Unknown Type'}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{extractEnglishName(center.display_name)}</h3>
-                          <p className="text-sm text-gray-600">{center.type || 'Unknown Type'}</p>
+                        <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {center.distance.toFixed(1)} km
                         </div>
-                      </div>
-                      <div className="text-sm font-medium text-gray-600">
-                        {center.distance.toFixed(1)} km
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 space-y-3">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                        <span className="truncate">{extractEnglishName(center.display_name)}</span>
                       </div>
                       
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                        {center.lat && center.lon && (
-                          <button
-                            onClick={() => openDirections({ lat: center.lat, lng: center.lon })}
-                            className="flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                      <div className="mt-4 space-y-3">
+                        <div className={`flex items-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <MapPin className={`h-4 w-4 mr-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`} />
+                          <span className="truncate">{extractEnglishName(center.display_name)}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                          {center.lat && center.lon && (
+                            <button
+                              onClick={() => openDirections({ lat: center.lat, lng: center.lon })}
+                              className={`flex items-center px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                  ? 'text-blue-400 hover:text-blue-300 bg-blue-900 bg-opacity-50 hover:bg-opacity-70' 
+                                  : 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
+                              }`}
+                            >
+                              <Navigation className="h-4 w-4 mr-1.5" />
+                              Get Directions
+                            </button>
+                          )}
+                          <a
+                            href={`tel:${center.type === 'Hospital' ? '108' : center.type === 'Police Station' ? '100' : '101'}`}
+                            className={`flex items-center px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 ${
+                              isDarkMode 
+                                ? 'text-green-400 hover:text-green-300 bg-green-900 bg-opacity-50 hover:bg-opacity-70' 
+                                : 'text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100'
+                            }`}
                           >
-                            <Navigation className="h-4 w-4 mr-1.5" />
-                            Get Directions
-                          </button>
-                        )}
-                        <a
-                          href={`tel:${center.type === 'Hospital' ? '108' : center.type === 'Police Station' ? '100' : '101'}`}
-                          className="flex items-center px-3 py-1.5 text-sm text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200"
-                        >
-                          <Phone className="h-4 w-4 mr-1.5" />
-                          Call Now
-                        </a>
+                            <Phone className="h-4 w-4 mr-1.5" />
+                            Call Now
+                          </a>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600">No nearby emergency centers found.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-gray-600">{error}</p>
-            </div>
-          )}
+                  ))
+                ) : (
+                  <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>No emergency centers found nearby</p>
+                )}
+              </div>
+            ) : (
+              <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Please enable location services to find nearby emergency centers</p>
+            )}
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-          <h2 className="text-xl font-semibold mb-4">Emergency Tips</h2>
-          <div className="space-y-3">
-            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="bg-red-100 p-2 rounded-full flex-shrink-0">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emergency Tips</h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className={`flex items-start space-x-3 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+                <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-2 rounded-full flex-shrink-0`}>
+                  <AlertTriangle className={`h-4 w-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Keep important documents in a waterproof container</p>
               </div>
-              <p className="text-gray-700 text-sm">Keep important documents in a waterproof container</p>
-            </div>
-            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="bg-red-100 p-2 rounded-full flex-shrink-0">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
+              <div className={`flex items-start space-x-3 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+                <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-2 rounded-full flex-shrink-0`}>
+                  <AlertTriangle className={`h-4 w-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Have an emergency kit ready with essential supplies</p>
               </div>
-              <p className="text-gray-700 text-sm">Have an emergency kit ready with essential supplies</p>
-            </div>
-            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="bg-red-100 p-2 rounded-full flex-shrink-0">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
+              <div className={`flex items-start space-x-3 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+                <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-2 rounded-full flex-shrink-0`}>
+                  <AlertTriangle className={`h-4 w-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Know your evacuation routes and meeting points</p>
               </div>
-              <p className="text-gray-700 text-sm">Know your evacuation routes and meeting points</p>
-            </div>
-            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="bg-red-100 p-2 rounded-full flex-shrink-0">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
+              <div className={`flex items-start space-x-3 p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+                <div className={`${isDarkMode ? 'bg-gray-600' : 'bg-red-100'} p-2 rounded-full flex-shrink-0`}>
+                  <AlertTriangle className={`h-4 w-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Keep emergency contact numbers saved offline</p>
               </div>
-              <p className="text-gray-700 text-sm">Keep emergency contact numbers saved offline</p>
             </div>
           </div>
         </div>

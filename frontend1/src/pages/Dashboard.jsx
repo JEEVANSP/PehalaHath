@@ -13,6 +13,7 @@ import { AlertTriangle, Users, MessageSquare, Bell } from "lucide-react";
 import axios from "axios";
 import { Sidebar } from "../components/Sidebar";
 import { GOOGLE_MAPS_CONFIG } from '../utils/googleMapsConfig';
+import { useThemeStore } from '../store/theme';
 
 const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
 const ALERTS_URL = "http://localhost:5000/api/auth/reports";
@@ -227,6 +228,7 @@ const EmergencyMap = React.memo(
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { isDarkMode } = useThemeStore();
 
   const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_CONFIG);
 
@@ -320,63 +322,68 @@ export function Dashboard() {
         <div className="grid grid-cols-12 gap-6 h-full p-6">
           {/* Left Column - Stats and Alerts */}
           <div className="col-span-12 lg:col-span-3 space-y-6">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Emergency Hub</h1>
-                <AlertTriangle className="h-8 w-8" />
+            <div className={`relative overflow-hidden rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-blue-600 to-blue-700'} shadow-lg p-6 text-white`}>
+              <div className="absolute inset-0 bg-black opacity-10"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-2xl font-bold">Emergency Hub</h1>
+                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-700/50' : 'bg-white/20'}`}>
+                    <AlertTriangle className="h-8 w-8" />
+                  </div>
+                </div>
+                <p className={`mt-2 ${isDarkMode ? 'text-blue-100' : 'text-white'}`}>
+                  Emergency Response Command Center
+                </p>
               </div>
-              <p className="mt-2 text-blue-100">
-                Emergency Response Command Center
-              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500">Active Incidents</p>
-                    <h3 className="text-2xl font-bold text-gray-900">15</h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Active Incidents</p>
+                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>15</h3>
                   </div>
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <AlertTriangle className="h-6 w-6 text-blue-600" />
+                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
+                    <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500">Response Teams</p>
-                    <h3 className="text-2xl font-bold text-gray-900">42</h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Response Teams</p>
+                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>42</h3>
                   </div>
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Users className="h-6 w-6 text-blue-600" />
+                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
+                    <Users className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500">Open Requests</p>
-                    <h3 className="text-2xl font-bold text-gray-900">23</h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Open Requests</p>
+                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>23</h3>
                   </div>
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <MessageSquare className="h-6 w-6 text-green-600" />
+                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-green-900/50' : 'bg-green-100'}`}>
+                    <MessageSquare className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
+            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     Recent Alerts
                   </h2>
                   <Link
                     to="/alerts"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className={`text-sm font-medium ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
                   >
                     View All
                   </Link>
@@ -389,44 +396,44 @@ export function Dashboard() {
                   .map((alert) => (
                     <div key={alert._id} className="flex items-start space-x-3">
                       <div
-                        className={`p-2 rounded-full ${
+                        className={`p-2 rounded-xl ${
                           alert.severity === "critical"
-                            ? "bg-red-100"
+                            ? isDarkMode ? "bg-red-900/50" : "bg-red-100"
                             : alert.severity === "high"
-                            ? "bg-orange-100"
+                            ? isDarkMode ? "bg-orange-900/50" : "bg-orange-100"
                             : alert.severity === "medium"
-                            ? "bg-yellow-100"
-                            : "bg-green-100"
+                            ? isDarkMode ? "bg-yellow-900/50" : "bg-yellow-100"
+                            : isDarkMode ? "bg-green-900/50" : "bg-green-100"
                         }`}>
                         <AlertTriangle
                           className={`h-4 w-4 ${
                             alert.severity === "critical"
-                              ? "text-red-600"
+                              ? isDarkMode ? "text-red-400" : "text-red-600"
                               : alert.severity === "high"
-                              ? "text-orange-600"
+                              ? isDarkMode ? "text-orange-400" : "text-orange-600"
                               : alert.severity === "medium"
-                              ? "text-yellow-600"
-                              : "text-green-600"
+                              ? isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                              : isDarkMode ? "text-green-400" : "text-green-600"
                           }`}
                         />
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-900">
+                        <h3 className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                           {alert.title}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
                           {alert.description.length > 60
                             ? `${alert.description.substring(0, 60)}...`
                             : alert.description}
                         </p>
-                        <span className="text-xs text-gray-400 mt-1 block">
+                        <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} mt-1 block`}>
                           {getRelativeTime(alert.createdAt)}
                         </span>
                       </div>
                     </div>
                   ))}
                 {alerts.length === 0 && (
-                  <div className="text-center text-gray-500 py-4">
+                  <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} py-4`}>
                     No recent alerts
                   </div>
                 )}
@@ -436,15 +443,15 @@ export function Dashboard() {
 
           {/* Right Column - Map and Resources */}
           <div className="col-span-12 lg:col-span-9 space-y-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
+            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     Emergency Incident Map
                   </h2>
                   <button
                     onClick={handleClick}
-                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700"
+                    className="inline-flex items-center px-4 py-2 rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
                   >
                     <AlertTriangle className="h-4 w-4 mr-2" />
                     Report Incident
@@ -457,29 +464,29 @@ export function Dashboard() {
                     selectedIncident={selectedIncident}
                     setSelectedIncident={setSelectedIncident}
                     location={location}
-                    alerts={alerts} // Add this line
+                    alerts={alerts}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-gray-500">Loading map...</div>
+                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Loading map...</div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
                 Resource Status
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Emergency Vehicles</span>
-                    <span className="font-medium text-gray-900">
+                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Emergency Vehicles</span>
+                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       8/10 Available
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
                     <div
                       className="h-full bg-green-500 rounded-full"
                       style={{ width: "80%" }}
@@ -488,12 +495,12 @@ export function Dashboard() {
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Medical Supplies</span>
-                    <span className="font-medium text-gray-900">
+                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Medical Supplies</span>
+                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       65% Remaining
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
                     <div
                       className="h-full bg-yellow-500 rounded-full"
                       style={{ width: "65%" }}
@@ -502,12 +509,12 @@ export function Dashboard() {
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Response Teams</span>
-                    <span className="font-medium text-gray-900">
+                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Response Teams</span>
+                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       12/15 Active
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
                     <div
                       className="h-full bg-blue-500 rounded-full"
                       style={{ width: "75%" }}
