@@ -40,6 +40,32 @@ export const updateResourceStatus = async (req, res) => {
   }
 };
 
+// Update resource allocation status
+export const updateResourceAllocation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resource = await Resource.findOne({ 'providedBy.id': id });
+    console.log(resource);
+    if (!resource) {
+      return res.status(404).json({ message: 'Resource not found' });
+    }
+
+    // Check if the resource was requested by the current user
+    // if (resource.providedBy.id !== req.user.id) {
+    //   return res.status(403).json({ message: 'Not authorized to update this resource' });
+    // }
+
+    resource.status = 'allocated';
+    
+    // Save the updated document
+    const updatedResource = await resource.save();
+
+    res.json(updatedResource);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 // Get user's resource requests
 export const getUserResourceRequests = async (req, res) => {
   try {
@@ -49,4 +75,4 @@ export const getUserResourceRequests = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}; 
+};

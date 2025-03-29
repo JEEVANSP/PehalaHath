@@ -34,6 +34,7 @@ export function Resources() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddResourceModalOpen, setIsAddResourceModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userResources, setUserResources] = useState([]);
   const [newResource, setNewResource] = useState({
     name: "",
     category: "",
@@ -52,19 +53,42 @@ export function Resources() {
   });
 
   useEffect(() => {
-    loadResources();
-  }, []);
+    const fetchData = async () => {
+      await loadResources();
+      if (user?.id) {
+        await loadUserResources();
+      }
+    };
+    
+    fetchData();
+  }, [user?.id]);
 
   const loadResources = async () => {
     try {
       setIsLoading(true);
       const data = await backendService.getAllResources();
       setResources(data);
+      console.log("All resources:", resources);
     } catch (error) {
       toast.error("Failed to load resources");
       console.error("Error loading resources:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadUserResources = async () => {
+    if (!user?.id) return; // Guard clause to prevent calling with no user
+
+    try {
+      console.log("Loading user resources for user ID:", user.id);
+      const data = await backendService.getUserRequestedResources(user.id, user.token); // Add token
+      console.log("User resources data received:", data);
+      setUserResources(Array.isArray(data) ? data : []); // Ensure data is an array
+    } catch (error) {
+      console.error("Error loading user resources:", error);
+      setUserResources([]); // Set empty array on error
+      toast.error("Failed to load your requested resources");
     }
   };
 
@@ -85,6 +109,28 @@ export function Resources() {
     };
   }, []);
   */
+
+  const handleMarkAsAllocated = async (resourceId) => {
+    try {
+      // First check if user is authenticated
+      if (!user || !user.token) {
+        toast.error("Please login to update resource status");
+        return;
+      }
+
+      await backendService.updateResourceAllocation(resourceId, user.token);
+      toast.success("Resource marked as allocated");
+      
+      // Reload both resources lists
+      await loadResources();
+      if (user?.id) {
+        await loadUserResources();
+      }
+    } catch (error) {
+      console.error("Error updating resource status:", error);
+      toast.error(error.response?.data?.message || "Failed to update resource status");
+    }
+  };
 
   const handleViewDetails = (resource) => {
     setSelectedResource(resource);
@@ -120,13 +166,51 @@ export function Resources() {
     });
   };
 
-  const handleNewResourceChange = (e) => {
-    const { name, value } = e.target;
-    setNewResource((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const renderUserRequestedResources = () => (
+    <div className={`mt-8 rounded-lg shadow overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h2 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          Your Requested Resources
+        </h2>
+      </div>
+      <div className="divide-y divide-gray-200">
+        {userResources.map(resource => (
+          <div key={resource._id} className="p-6 flex items-center justify-between">
+            <div>
+              <h3 className={`font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                {resource.name}
+              </h3>
+              <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                {resource.description}
+              </p>
+              <div className="mt-2">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  resource.status === 'allocated' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {resource.status}
+                </span>
+              </div>
+            </div>
+            {resource.status === 'requested' && (
+              <button
+                onClick={() => handleMarkAsAllocated(resource.providedBy.id)}
+                className="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+              >
+                Mark as Allocated
+              </button>
+            )}
+          </div>
+        ))}
+        {userResources.length === 0 && (
+          <div className="p-6 text-center text-gray-500">
+            You haven't requested any resources yet
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   const handleSubmitNewResource = async (e) => {
     e.preventDefault();
@@ -173,17 +257,9 @@ export function Resources() {
   });
 
   return (
-    <div
-      className={`p-6 max-w-7xl mx-auto ${
-        isDarkMode ? "text-gray-100" : "text-gray-900"
-      }`}
-    >
+    <div className={`p-6 max-w-7xl mx-auto ${isDarkMode ? "text-gray-100" : "text-gray-900"}`}>
       <div className="flex justify-between items-center mb-6">
-        <h1
-          className={`text-2xl font-bold ${
-            isDarkMode ? "text-white" : "text-gray-900"
-          }`}
-        >
+        <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
           Resource Management
         </h1>
         <button
@@ -196,12 +272,11 @@ export function Resources() {
         </button>
       </div>
 
+      {/* Add User Requested Resources Section */}
+      {user && renderUserRequestedResources()}
+
       {/* Filters */}
-      <div
-        className={`mb-6 p-4 rounded-lg ${
-          isDarkMode ? "bg-gray-800" : "bg-white"
-        } shadow-sm`}
-      >
+      <div className={`mb-6 p-4 rounded-lg ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow-sm`}>
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">

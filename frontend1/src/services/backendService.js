@@ -2,11 +2,27 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api'; // Update this with your backend URL
 
+axios.interceptors.request.use(request => {
+  console.log('Starting API Request:', request.url);
+  return request;
+});
+
+// Add response interceptor for debugging
+axios.interceptors.response.use(response => {
+  console.log('API Response:', {
+    url: response.config.url,
+    status: response.status,
+    data: response.data
+  });
+  return response;
+});
+
 export const backendService = {
   // Get all resources
   getAllResources: async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/resources`);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching resources:', error);
@@ -36,14 +52,38 @@ export const backendService = {
     }
   },
 
-  // Get user's resource requests
-  getUserResourceRequests: async (userId) => {
+  // Get resources requested by the current user
+  getUserRequestedResources: async (userId, token) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/resources/user/${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/resources/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching user resources:', error);
       throw error;
     }
-  }
-}; 
+  },
+
+  // Update resource allocation status
+  updateResourceAllocation: async (resourceId, token) => {
+    try {
+      const response = await axios.patch(
+        `${API_BASE_URL}/resources/${resourceId}/allocate`,
+        { status: 'allocated' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating resource allocation:', error);
+      throw error;
+    }
+  },
+};
