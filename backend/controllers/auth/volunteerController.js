@@ -23,6 +23,16 @@ export const createTask = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
+    // Parse duration hours from estimatedDuration
+    let durationHours = 0;
+    if (estimatedDuration) {
+      // Try to extract numeric value from the duration string
+      const durationMatch = estimatedDuration.match(/(\d+(\.\d+)?)/);
+      if (durationMatch) {
+        durationHours = parseFloat(durationMatch[0]);
+      }
+    }
+    
     const newTask = new VolunteerTask({
       title,
       description,
@@ -30,6 +40,7 @@ export const createTask = async (req, res) => {
       priority: priority || 'medium',
       requiredSkills: requiredSkills || [],
       estimatedDuration: estimatedDuration || 'Not specified',
+      durationHours: durationHours,
       maxVolunteers: maxVolunteers || 1,
       createdBy: req.user.id,
       volunteers: []
@@ -93,7 +104,7 @@ export const assignVolunteer = async (req, res) => {
 
 export const completeTask = async (req, res) => {
   try {
-    const { taskId } = req.body;
+    const { taskId, actualHours } = req.body;
     const userId = req.user.id;
     
     const task = await VolunteerTask.findById(taskId);
@@ -116,6 +127,13 @@ export const completeTask = async (req, res) => {
     
     task.status = 'completed';
     task.completedAt = new Date();
+    
+    // Set actual hours if provided, otherwise use estimated hours
+    if (actualHours) {
+      task.actualHours = parseFloat(actualHours);
+    } else {
+      task.actualHours = task.durationHours;
+    }
     
     await task.save();
     
@@ -152,17 +170,31 @@ export const getStats = async (req, res) => {
     // Count unique locations with active tasks
     const activeLocationsSet = new Set(activeTasks.map(task => task.location));
     
-    // Calculate estimated hours contributed (simplified calculation)
-    // Assuming each completed task took 2 hours per volunteer on average
+    // Calculate hours contributed properly
     let hoursContributed = 0;
+    
+    // For completed tasks, use actual hours * volunteer count
     completedTasks.forEach(task => {
       const volunteerCount = task.volunteers ? task.volunteers.length : 0;
-      hoursContributed += volunteerCount * 2; // 2 hours per volunteer per task
+      if (task.actualHours) {
+        hoursContributed += task.actualHours * volunteerCount;
+      } else if (task.durationHours) {
+        hoursContributed += task.durationHours * volunteerCount;
+      }
+    });
+    
+    // For in-progress tasks, use estimated hours * volunteer count
+    const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
+    inProgressTasks.forEach(task => {
+      const volunteerCount = task.volunteers ? task.volunteers.length : 0;
+      if (task.durationHours) {
+        hoursContributed += task.durationHours * volunteerCount;
+      }
     });
     
     const stats = {
       activeVolunteers: activeVolunteersSet.size,
-      hoursContributed,
+      hoursContributed: Math.round(hoursContributed * 10) / 10, // Round to 1 decimal place
       tasksCompleted: completedTasks.length,
       activeLocations: activeLocationsSet.size
     };

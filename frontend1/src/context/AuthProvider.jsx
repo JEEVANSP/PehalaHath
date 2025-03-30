@@ -41,6 +41,15 @@ export const AuthProvider = ({ children }) => {
     console.log("Updated user state:", user);
   }, [user]);
 
+  const updateUserInfo = (userData) => {
+    if(user && userData) {
+      setUser(prevUser => ({
+        ...prevUser,
+        ...userData
+      }))
+    }
+  };
+
   const login = (token) => {
     try {
       // Decode the JWT token
@@ -75,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout,updateUserInfo }}>
       {children}
     </AuthContext.Provider>
   );

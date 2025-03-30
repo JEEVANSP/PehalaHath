@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home } from 'lucide-react';
+import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home,User } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider';
 import { useThemeStore } from '../store/theme';
 
@@ -17,6 +17,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     { icon: <AlertCircle size={20} />, label: 'Report Disaster', path: '/report-disaster' },
     { icon: <Box size={20} />, label: 'Resources', path: '/resources' },
     { icon: <Heart size={20} />, label: 'Volunteers', path: '/volunteers' },
+    { icon: <User size={20} />, label: 'Profile', path: '/profile' },
     { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
   ];
 

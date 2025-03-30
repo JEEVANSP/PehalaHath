@@ -14,6 +14,7 @@ import { Settings } from './pages/Settings';
 import { Volunteers } from './pages/Volunteers';
 import { Layout } from './components/Layout';
 import { Toaster } from 'react-hot-toast';
+import { Profile } from './pages/Profile';
 
 function App() {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ function App() {
           <Route path="/resources" element={<Resources/>}/>
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/volunteers" element={<Volunteers/>}/>
+          <Route path='/profile' element={<Profile/>}/>
         </Route>
       </Routes>
     </div>

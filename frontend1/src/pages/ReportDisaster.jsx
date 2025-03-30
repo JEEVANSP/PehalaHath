@@ -137,10 +137,10 @@ export function ReportDisaster() {
   }
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'} py-12 px-4 sm:px-6 lg:px-8`}>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'} py-8 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-4xl mx-auto">
         {/* Enhanced Header Section */}
-        <div className={`relative overflow-hidden rounded-t-3xl shadow-2xl p-10 ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-red-600 via-red-500 to-red-400'}`}>
+        <div className={`relative overflow-hidden rounded-t-3xl shadow-2xl p-8 ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-red-600 via-red-500 to-red-400'}`}>
           <div className="absolute inset-0 bg-black opacity-10"></div>
           <div className="relative z-10">
             <div className="flex items-center space-x-6">
@@ -160,19 +160,19 @@ export function ReportDisaster() {
         </div>
 
         {/* Enhanced Form Section */}
-        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-b-3xl shadow-2xl p-10 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-b-3xl shadow-2xl p-6 md:p-8 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Type and Severity Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                   Emergency Type
                 </label>
                 <select
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
-                  className={`w-full rounded-xl shadow-sm transition-colors ${
+                  className={`w-full h-11 px-3 rounded-xl shadow-sm transition-colors ${
                     isDarkMode 
                       ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
                       : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
@@ -186,15 +186,15 @@ export function ReportDisaster() {
                 </select>
               </div>
 
-              <div className="space-y-3">
-                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <div>
+                <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                   Severity Level
                 </label>
                 <select
                   name="severity"
                   value={formData.severity}
                   onChange={handleChange}
-                  className={`w-full rounded-xl shadow-sm transition-colors ${
+                  className={`w-full h-11 px-3 rounded-xl shadow-sm transition-colors ${
                     isDarkMode 
                       ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
                       : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
@@ -210,8 +210,8 @@ export function ReportDisaster() {
             </div>
 
             {/* Title Input */}
-            <div className="space-y-3">
-              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="pt-1">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Title
               </label>
               <input
@@ -219,7 +219,7 @@ export function ReportDisaster() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full rounded-xl shadow-sm transition-colors ${
+                className={`w-full h-11 px-3 rounded-xl shadow-sm transition-colors ${
                   isDarkMode 
                     ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
                     : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
@@ -229,8 +229,8 @@ export function ReportDisaster() {
             </div>
 
             {/* Description Textarea */}
-            <div className="space-y-3">
-              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="pt-1">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Description
               </label>
               <textarea
@@ -238,7 +238,7 @@ export function ReportDisaster() {
                 rows={4}
                 value={formData.description}
                 onChange={handleChange}
-                className={`w-full rounded-xl shadow-sm transition-colors ${
+                className={`w-full px-3 py-2 rounded-xl shadow-sm transition-colors ${
                   isDarkMode 
                     ? 'bg-gray-700 border-gray-600 text-white hover:border-red-500 focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50' 
                     : 'border-gray-200 hover:border-red-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50'
@@ -248,8 +248,8 @@ export function ReportDisaster() {
             </div>
 
             {/* Location Input */}
-            <div className="space-y-3">
-              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="pt-1">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Location
               </label>
               <div className="flex rounded-xl shadow-sm overflow-hidden">
@@ -295,12 +295,12 @@ export function ReportDisaster() {
             </div>
 
             {/* Image Upload Section */}
-            <div className="space-y-4">
-              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="pt-2">
+              <label className={`text-sm font-semibold block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Upload Images
               </label>
               <div className="flex items-center justify-center w-full">
-                <label className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                <label className={`flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
                   isDarkMode 
                     ? 'border-red-900 bg-gray-700/50 hover:bg-gray-700' 
                     : 'border-red-100 bg-red-50/30 hover:bg-red-50/50'
@@ -325,7 +325,7 @@ export function ReportDisaster() {
               </div>
 
               {/* Image Preview Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
                 {imagePreview.map((src, index) => (
                   <div key={index} className="relative group rounded-xl overflow-hidden">
                     <img
@@ -353,50 +353,52 @@ export function ReportDisaster() {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full py-4 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-semibold shadow-xl flex items-center justify-center space-x-3 ${
-                isSubmitting
-                  ? isDarkMode 
-                    ? 'bg-gray-700 cursor-not-allowed' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                  : isDarkMode
-                    ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
-                    : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
-              } text-white`}
-            >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Submitting Report...</span>
-                </>
-              ) : (
-                <>
-                  <AlertTriangle className="h-6 w-6" />
-                  <span>Submit Emergency Report</span>
-                </>
-              )}
-            </button>
+            <div className="pt-5">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full py-3.5 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] font-semibold shadow-xl flex items-center justify-center space-x-3 ${
+                  isSubmitting
+                    ? isDarkMode 
+                      ? 'bg-gray-700 cursor-not-allowed' 
+                      : 'bg-gray-400 cursor-not-allowed'
+                    : isDarkMode
+                      ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+                      : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+                } text-white`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Submitting Report...</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="h-6 w-6" />
+                    <span>Submit Emergency Report</span>
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>

@@ -123,31 +123,31 @@ export function Volunteers() {
     }
   };
 
-  const handleCompleteTask = async (taskId) => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/complete`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
-        },
-        body: JSON.stringify({ taskId }),
-      });
+const handleCompleteTask = async (taskId, actualHours) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/complete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify({ taskId, actualHours }),
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (response.ok) {
-        toast.success("Task marked as completed!");
-        fetchTasks(); // Refresh tasks
-        fetchStats(); // Refresh stats
-      } else {
-        toast.error(result.error || "Failed to complete task");
-      }
-    } catch (error) {
-      console.error("Error completing task:", error);
-      toast.error("Something went wrong. Please try again.");
+    if (response.ok) {
+      toast.success("Task marked as completed!");
+      fetchTasks(); // Refresh tasks
+      fetchStats(); // Refresh stats
+    } else {
+      toast.error(result.error || "Failed to complete task");
     }
-  };
+  } catch (error) {
+    console.error("Error completing task:", error);
+    toast.error("Something went wrong. Please try again.");
+  }
+};
 
   if (loading) {
     return (
@@ -177,7 +177,7 @@ export function Volunteers() {
             {user?.role === "authority" && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center px-6 py-3 rounded-xl shadow-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-200 text-white font-medium"
+                className="inline-flex items-center px-6 py-3 rounded-xl shadow-lg bg-blue-800 bg-opacity-20 hover:bg-opacity-30 transition-all duration-200 text-white font-medium"
               >
                 <UserPlus className="h-5 w-5 mr-2" />
                 Create Task
