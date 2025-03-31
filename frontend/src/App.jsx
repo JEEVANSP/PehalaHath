@@ -15,6 +15,7 @@ import { Volunteers } from './pages/Volunteers';
 import { Layout } from './components/Layout';
 import { Toaster } from 'react-hot-toast';
 import { Profile } from './pages/Profile';
+import { DamWaterLevels } from './pages/DamWaterLevels';
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -76,6 +77,7 @@ function App() {
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/volunteers" element={<Volunteers/>}/>
           <Route path="/profile" element={<Profile/>}/>
+          <Route path="/dam-water-levels" element={<DamWaterLevels/>}/>
         </Route>
         <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
       </Routes>

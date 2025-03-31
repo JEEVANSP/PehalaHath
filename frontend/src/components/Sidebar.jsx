@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home,User,Globe } from 'lucide-react';
+import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home,User,Globe, Droplet } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider';
 import { useThemeStore } from '../store/theme';
 
@@ -23,6 +23,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     { icon: <Box size={20} />, label: 'Resources', path: '/resources' },
     { icon: <Heart size={20} />, label: 'Volunteers', path: '/volunteers' },
     { icon: <User size={20} />, label: 'Profile', path: '/profile' },
+    {icon: <Droplet className='h-5 w-5'/>, label: 'Dam Water Levels', path: '/dam-water-levels'},
     { icon: <Globe size={20} />, label: 'Landslide Map', path: 'https://pehlahath123.projects.earthengine.app/view/pehla-hath' },
     { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
   ];

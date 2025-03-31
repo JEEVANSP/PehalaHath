@@ -6,6 +6,7 @@ import connectDB from './config/connect.js';
 import emergencyRoutes from './routes/emergency.js';
 import volunteerRoutes from './routes/volunteers.js';
 import emailRoutes from './routes/emailRoutes.js';
+import damRoutes from './routes/damRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -24,6 +25,7 @@ connectDB(process.env.MONGODBURL);
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/volunteers',volunteerRoutes);
 app.use('/api/email',emailRoutes);
+app.use('/api/dams',damRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
