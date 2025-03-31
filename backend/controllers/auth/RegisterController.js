@@ -3,11 +3,11 @@ import UserSchema from '../../config/models/userModel.js'; // Adjust the path as
 
 // User registration controller
 export const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role,phone } = req.body;
 
   // Validate required fields
-  if (!name || !email || !password || !role) {
-    return res.status(400).json({ error: 'Name, email, password, and role are required' });
+  if (!name || !email || !password || !role || !phone) {
+    return res.status(400).json({ error: 'Name, email, password, phone and role are required' });
   }
 
   try {
@@ -26,6 +26,7 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      phone,
       role
     });
 

@@ -149,7 +149,7 @@ export function Settings() {
         } rounded-lg shadow-lg p-4 text-center`}
       >
         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          DisasterWatch v1.0.0
+          PehlaHath
         </p>
       </div>
     </div>

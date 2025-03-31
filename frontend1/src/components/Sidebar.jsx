@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home,User } from 'lucide-react';
+import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X, Home,User,Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider';
 import { useThemeStore } from '../store/theme';
 
@@ -8,6 +8,11 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
   const { logout } = useAuth();
   const { isDarkMode } = useThemeStore();
   const location = useLocation();
+
+  const handleLogout = () => {
+    localStorage.removeItem('chatHistory');
+    logout();
+  };
 
   const sidebarItems = [
     { icon: <Home size={20} />, label: 'Dashboard', path: '/' },
@@ -18,6 +23,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     { icon: <Box size={20} />, label: 'Resources', path: '/resources' },
     { icon: <Heart size={20} />, label: 'Volunteers', path: '/volunteers' },
     { icon: <User size={20} />, label: 'Profile', path: '/profile' },
+    { icon: <Globe size={20} />, label: 'Landslide Map', path: 'https://pehlahath123.projects.earthengine.app/view/pehla-hath' },
     { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
   ];
 
@@ -86,7 +92,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
         </div>
         
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className={`flex items-center ${isSidebarOpen ? 'space-x-3' : 'justify-center'} 
             p-3 rounded-lg transition-all duration-200
             ${isDarkMode 

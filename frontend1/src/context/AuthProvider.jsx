@@ -28,8 +28,10 @@ export const AuthProvider = ({ children }) => {
           id: decoded.id,
           name: decoded.name,
           email: decoded.email,
-          role: decoded.role
+          role: decoded.role,
+          phone: decoded.phone,
         });
+        console.log("User phone:", decoded.phone);
       } catch (error) {
         console.error("Invalid token:", error);
         localStorage.removeItem('token');
@@ -67,7 +69,8 @@ export const AuthProvider = ({ children }) => {
         id: decoded.id,
         name: decoded.name,
         email: decoded.email,
-        role: decoded.role
+        role: decoded.role,
+        phone: decoded.phone,
       });
       
       navigate('/'); // Redirect after login
@@ -78,6 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('chatHistory');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     navigate('/login'); // Redirect after logout

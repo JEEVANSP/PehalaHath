@@ -12,11 +12,13 @@ import {
 import { AlertTriangle, Users, MessageSquare, Bell } from "lucide-react";
 import axios from "axios";
 import { Sidebar } from "../components/Sidebar";
-import { GOOGLE_MAPS_CONFIG } from '../utils/googleMapsConfig';
-import { useThemeStore } from '../store/theme';
+import { GOOGLE_MAPS_CONFIG } from "../utils/googleMapsConfig";
+import { useThemeStore } from "../store/theme";
 
 const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
 const ALERTS_URL = "http://localhost:5000/api/auth/reports";
+const VOLUNTEERS_URL = "http://localhost:5000/api/volunteers";
+const RESOURCES_URL = "http://localhost:5000/api/resources";
 
 const getRelativeTime = (timestamp) => {
   const now = new Date();
@@ -239,35 +241,61 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [alerts, setAlerts] = useState([]);
+  const [stats, setStats] = useState({
+    activeIncidents: 0,
+    responseTeamMembers: 0,
+    openRequests: 0,
+  });
 
   // Add handleClick function definition
   const handleClick = () => {
     navigate("/report-disaster");
   };
 
-  // Add this useEffect to fetch alerts
+  // Fetch all required data for the dashboard
   useEffect(() => {
-    const fetchAlerts = async () => {
+    const fetchDashboardData = async () => {
+      if (!user?.token) return;
+
       try {
-        const response = await axios.get(ALERTS_URL + "/get-report", {
+        // Fetch alerts (active incidents)
+        const alertsResponse = await axios.get(ALERTS_URL + "/get-report", {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
-        console.log("Raw response data:", response.data);
-        const alertsData = Array.isArray(response.data)
-          ? response.data
-          : response.data.reports
-          ? response.data.reports
+        const alertsData = Array.isArray(alertsResponse.data)
+          ? alertsResponse.data
+          : alertsResponse.data.reports
+          ? alertsResponse.data.reports
           : [];
-        console.log("Processed alerts data:", alertsData);
         setAlerts(alertsData);
+
+        // Fetch volunteer stats (response team)
+        const volunteersResponse = await axios.get(`${VOLUNTEERS_URL}/stats`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+
+        // Fetch resource requests
+        const resourcesResponse = await axios.get(`${RESOURCES_URL}`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+
+        // Update stats with real data
+        setStats({
+          activeIncidents: alertsData.length,
+          responseTeamMembers: volunteersResponse.data?.activeVolunteers || 0,
+          openRequests:
+            resourcesResponse.data?.filter((r) => r.status === "requested")
+              .length || 0,
+        });
+
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching alerts:", error);
+        console.error("Error fetching dashboard data:", error);
+        setLoading(false);
       }
     };
 
-    if (user?.token) {
-      fetchAlerts();
-    }
+    fetchDashboardData();
   }, [user]);
 
   // Add this effect to monitor alerts state changes
@@ -322,68 +350,178 @@ export function Dashboard() {
         <div className="grid grid-cols-12 gap-6 h-full p-6">
           {/* Left Column - Stats and Alerts */}
           <div className="col-span-12 lg:col-span-3 space-y-6">
-            <div className={`relative overflow-hidden rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-blue-600 to-blue-700'} shadow-lg p-6 text-white`}>
+            <div
+              className={`relative overflow-hidden rounded-2xl ${
+                isDarkMode
+                  ? "bg-gray-800"
+                  : "bg-gradient-to-br from-blue-600 to-blue-700"
+              } shadow-lg p-6 text-white`}
+            >
               <div className="absolute inset-0 bg-black opacity-10"></div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <h1 className="text-2xl font-bold">Emergency Hub</h1>
-                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-700/50' : 'bg-white/20'}`}>
+                  <div
+                    className={`p-3 rounded-xl ${
+                      isDarkMode ? "bg-blue-700/50" : "bg-white/20"
+                    }`}
+                  >
                     <AlertTriangle className="h-8 w-8" />
                   </div>
                 </div>
-                <p className={`mt-2 ${isDarkMode ? 'text-blue-100' : 'text-white'}`}>
+                <p
+                  className={`mt-2 ${
+                    isDarkMode ? "text-blue-100" : "text-white"
+                  }`}
+                >
                   Emergency Response Command Center
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <div
+                className={`${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                } rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${
+                  isDarkMode ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Active Incidents</p>
-                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>15</h3>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      Active Incidents
+                    </p>
+                    <h3
+                      className={`text-2xl font-bold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading ? "..." : stats.activeIncidents}
+                    </h3>
                   </div>
-                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
-                    <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <div
+                    className={`p-3 rounded-xl ${
+                      isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
+                    }`}
+                  >
+                    <AlertTriangle
+                      className={`h-6 w-6 ${
+                        isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <div
+                className={`${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                } rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${
+                  isDarkMode ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Response Teams</p>
-                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>42</h3>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      Active Volunteers
+                    </p>
+                    <h3
+                      className={`text-2xl font-bold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading ? "..." : stats.responseTeamMembers}
+                    </h3>
                   </div>
-                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
-                    <Users className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <div
+                    className={`p-3 rounded-xl ${
+                      isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
+                    }`}
+                  >
+                    <Users
+                      className={`h-6 w-6 ${
+                        isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <div
+                className={`${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                } rounded-xl shadow-lg p-6 transform hover:scale-105 transition-all duration-200 border ${
+                  isDarkMode ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Open Requests</p>
-                    <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>23</h3>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      Resource Requests
+                    </p>
+                    <h3
+                      className={`text-2xl font-bold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading ? "..." : stats.openRequests}
+                    </h3>
                   </div>
-                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-green-900/50' : 'bg-green-100'}`}>
-                    <MessageSquare className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                  <div
+                    className={`p-3 rounded-xl ${
+                      isDarkMode ? "bg-green-900/50" : "bg-green-100"
+                    }`}
+                  >
+                    <MessageSquare
+                      className={`h-6 w-6 ${
+                        isDarkMode ? "text-green-400" : "text-green-600"
+                      }`}
+                    />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-              <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <div
+              className={`${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } rounded-xl shadow-lg overflow-hidden border ${
+                isDarkMode ? "border-gray-700" : "border-gray-100"
+              }`}
+            >
+              <div
+                className={`p-4 border-b ${
+                  isDarkMode ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
                 <div className="flex items-center justify-between">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h2
+                    className={`text-lg font-semibold ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Recent Alerts
                   </h2>
                   <Link
                     to="/alerts"
-                    className={`text-sm font-medium ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                    className={`text-sm font-medium ${
+                      isDarkMode
+                        ? "text-blue-400 hover:text-blue-300"
+                        : "text-blue-600 hover:text-blue-700"
+                    }`}
                   >
                     View All
                   </Link>
@@ -398,42 +536,75 @@ export function Dashboard() {
                       <div
                         className={`p-2 rounded-xl ${
                           alert.severity === "critical"
-                            ? isDarkMode ? "bg-red-900/50" : "bg-red-100"
+                            ? isDarkMode
+                              ? "bg-red-900/50"
+                              : "bg-red-100"
                             : alert.severity === "high"
-                            ? isDarkMode ? "bg-orange-900/50" : "bg-orange-100"
+                            ? isDarkMode
+                              ? "bg-orange-900/50"
+                              : "bg-orange-100"
                             : alert.severity === "medium"
-                            ? isDarkMode ? "bg-yellow-900/50" : "bg-yellow-100"
-                            : isDarkMode ? "bg-green-900/50" : "bg-green-100"
-                        }`}>
+                            ? isDarkMode
+                              ? "bg-yellow-900/50"
+                              : "bg-yellow-100"
+                            : isDarkMode
+                            ? "bg-green-900/50"
+                            : "bg-green-100"
+                        }`}
+                      >
                         <AlertTriangle
                           className={`h-4 w-4 ${
                             alert.severity === "critical"
-                              ? isDarkMode ? "text-red-400" : "text-red-600"
+                              ? isDarkMode
+                                ? "text-red-400"
+                                : "text-red-600"
                               : alert.severity === "high"
-                              ? isDarkMode ? "text-orange-400" : "text-orange-600"
+                              ? isDarkMode
+                                ? "text-orange-400"
+                                : "text-orange-600"
                               : alert.severity === "medium"
-                              ? isDarkMode ? "text-yellow-400" : "text-yellow-600"
-                              : isDarkMode ? "text-green-400" : "text-green-600"
+                              ? isDarkMode
+                                ? "text-yellow-400"
+                                : "text-yellow-600"
+                              : isDarkMode
+                              ? "text-green-400"
+                              : "text-green-600"
                           }`}
                         />
                       </div>
                       <div>
-                        <h3 className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <h3
+                          className={`text-sm font-medium ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
                           {alert.title}
                         </h3>
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                        <p
+                          className={`text-xs ${
+                            isDarkMode ? "text-gray-400" : "text-gray-500"
+                          } mt-1`}
+                        >
                           {alert.description.length > 60
                             ? `${alert.description.substring(0, 60)}...`
                             : alert.description}
                         </p>
-                        <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} mt-1 block`}>
+                        <span
+                          className={`text-xs ${
+                            isDarkMode ? "text-gray-500" : "text-gray-400"
+                          } mt-1 block`}
+                        >
                           {getRelativeTime(alert.createdAt)}
                         </span>
                       </div>
                     </div>
                   ))}
                 {alerts.length === 0 && (
-                  <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} py-4`}>
+                  <div
+                    className={`text-center ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    } py-4`}
+                  >
                     No recent alerts
                   </div>
                 )}
@@ -443,10 +614,24 @@ export function Dashboard() {
 
           {/* Right Column - Map and Resources */}
           <div className="col-span-12 lg:col-span-9 space-y-6">
-            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-              <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <div
+              className={`${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } rounded-xl shadow-lg overflow-hidden border ${
+                isDarkMode ? "border-gray-700" : "border-gray-100"
+              }`}
+            >
+              <div
+                className={`p-4 border-b ${
+                  isDarkMode ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
                 <div className="flex items-center justify-between">
-                  <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h2
+                    className={`text-lg font-semibold ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Emergency Incident Map
                   </h2>
                   <button
@@ -468,56 +653,160 @@ export function Dashboard() {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Loading map...</div>
+                    <div
+                      className={`${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      Loading map...
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-              <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+            <div
+              className={`${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } rounded-xl shadow-lg p-6 border ${
+                isDarkMode ? "border-gray-700" : "border-gray-100"
+              }`}
+            >
+              <h2
+                className={`text-lg font-semibold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                } mb-4`}
+              >
                 Resource Status
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Emergency Vehicles</span>
-                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      8/10 Available
+                    <span
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      Critical Incidents
+                    </span>
+                    <span
+                      className={`font-medium ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading
+                        ? "..."
+                        : `${
+                            alerts.filter((a) => a.severity === "critical")
+                              .length
+                          }/${alerts.length}`}
                     </span>
                   </div>
-                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
+                  <div
+                    className={`h-2 ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                    } rounded-full overflow-hidden`}
+                  >
                     <div
-                      className="h-full bg-green-500 rounded-full"
-                      style={{ width: "80%" }}
+                      className="h-full bg-red-500 rounded-full"
+                      style={{
+                        width: `${
+                          alerts.length
+                            ? (alerts.filter((a) => a.severity === "critical")
+                                .length /
+                                alerts.length) *
+                              100
+                            : 0
+                        }%`,
+                      }}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Medical Supplies</span>
-                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      65% Remaining
+                    <span
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      Resource Fulfillment
+                    </span>
+                    <span
+                      className={`font-medium ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading
+                        ? "..."
+                        : `${
+                            stats.openRequests
+                              ? Math.round(
+                                  (1 -
+                                    stats.openRequests /
+                                      (stats.openRequests + 5)) *
+                                    100
+                                )
+                              : 100
+                          }%`}
                     </span>
                   </div>
-                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
+                  <div
+                    className={`h-2 ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                    } rounded-full overflow-hidden`}
+                  >
                     <div
                       className="h-full bg-yellow-500 rounded-full"
-                      style={{ width: "65%" }}
+                      style={{
+                        width: `${
+                          stats.openRequests
+                            ? Math.round(
+                                (1 -
+                                  stats.openRequests /
+                                    (stats.openRequests + 5)) *
+                                  100
+                              )
+                            : 100
+                        }%`,
+                      }}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Response Teams</span>
-                    <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      12/15 Active
+                    <span
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      Volunteer Coverage
+                    </span>
+                    <span
+                      className={`font-medium ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {loading
+                        ? "..."
+                        : `${Math.min(
+                            stats.responseTeamMembers,
+                            alerts.length
+                          )}/${Math.max(alerts.length, 1)}`}
                     </span>
                   </div>
-                  <div className={`h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
+                  <div
+                    className={`h-2 ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                    } rounded-full overflow-hidden`}
+                  >
                     <div
                       className="h-full bg-blue-500 rounded-full"
-                      style={{ width: "75%" }}
+                      style={{
+                        width: `${
+                          alerts.length
+                            ? Math.min(
+                                100,
+                                (stats.responseTeamMembers /
+                                  Math.max(alerts.length, 1)) *
+                                  100
+                              )
+                            : 100
+                        }%`,
+                      }}
                     />
                   </div>
                 </div>

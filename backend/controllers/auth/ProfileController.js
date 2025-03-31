@@ -18,11 +18,11 @@ export const getUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, email, role } = req.body;
-    if (!name || !email || !role) {
+    const { name, email, role, phone, notifications } = req.body;
+    if (!name || !email || !role || !phone) {
       return res
         .status(400)
-        .json({ error: "Name, email, and role are required" });
+        .json({ error: "Name, email, phone and role are required" });
     }
     const existingUser = await UserSchema.findOne({
       email,
@@ -33,17 +33,34 @@ export const updateUserProfile = async (req, res) => {
         .status(400)
         .json({ error: "Email is already in use by another account" });
     }
+    
+    // Update user data including notification preferences
+    const updateData = {
+      name,
+      email,
+      role,
+      phone,
+      notifications
+    };
+    
+    // Only update notifications if they were provided
+    if (notifications) {
+      updateData.notifications = notifications;
+    }
+    
     const updatedUser = await UserSchema.findByIdAndUpdate(
       userId,
-      { name, email, role },
+      updateData,
       { new: true }
     ).select("-password");
+    
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
+    
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error updating user profile:", error);
+    console.error("Error updating profile:", error);
     res.status(500).json({ error: "Server error" });
   }
 };

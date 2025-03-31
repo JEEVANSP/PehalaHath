@@ -12,6 +12,7 @@ import {
   AlertCircle,
   MapPin,
   Shield,
+  Phone
 } from "lucide-react";
 import Autocomplete from "react-google-autocomplete";
 import { backendService } from "../services/backendService";
@@ -49,6 +50,7 @@ export function Resources() {
       name: user?.name || "",
       email: user?.email || "",
       role: user?.role || "volunteer",
+      phone:user?.phone || ""
     },
   });
 
@@ -193,6 +195,7 @@ export function Resources() {
         name: user?.name || "",
         email: user?.email || "",
         role: user?.role || "volunteer",
+        phone: user?.phone || ""
       },
     });
   };
@@ -294,6 +297,7 @@ export function Resources() {
           name: user.name,
           email: user.email,
           role: user.role,
+          phone: user.phone,
         },
       };
 
@@ -767,6 +771,29 @@ export function Resources() {
                         style={{ textTransform: "capitalize" }}
                       >
                         {selectedResource.providedBy.role}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`flex items-center space-x-2 p-3 rounded-lg ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-50"
+                    }`}
+                  >
+                    <Phone className="h-5 w-5 text-blue-400" />
+                    <div>
+                      <p
+                        className={`text-xs ${
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        Phone
+                      </p>
+                      <p
+                        className={`text-sm font-medium ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {selectedResource.providedBy.phone || "Not provided"}
                       </p>
                     </div>
                   </div>

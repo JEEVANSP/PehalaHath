@@ -144,6 +144,8 @@ export function EmergencyContacts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isDarkMode } = useThemeStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCenters, setFilteredCenters] = useState([]);
 
   useEffect(() => {
     getUserLocation(setLocation, setLoading, setError);
@@ -155,6 +157,30 @@ export function EmergencyContacts() {
     }
   }, [location]);
 
+  // Filter centers based on search term
+  useEffect(() => {
+    if (!emergencyCenters.length) {
+      setFilteredCenters([]);
+      return;
+    }
+
+    if (!searchTerm.trim()) {
+      setFilteredCenters(emergencyCenters);
+      return;
+    }
+
+    const lowercasedSearch = searchTerm.toLowerCase();
+    const filtered = emergencyCenters.filter(center => {
+      const displayName = extractEnglishName(center.display_name).toLowerCase();
+      const type = (center.type || '').toLowerCase();
+      
+      return displayName.includes(lowercasedSearch) || 
+             type.includes(lowercasedSearch);
+    });
+    
+    setFilteredCenters(filtered);
+  }, [searchTerm, emergencyCenters]);
+
   const openDirections = (destination) => {
     if (!destination || !location) return;
     
@@ -162,6 +188,11 @@ export function EmergencyContacts() {
     const dest = `${destination.lat},${destination.lng}`;
     const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
     window.open(url, '_blank');
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   if (loading) {
@@ -175,6 +206,7 @@ export function EmergencyContacts() {
   return (
     <div className="space-y-8">
       {/* Header Section with Gradient */}
+      {/* Header Section with Gradient */}
       <div className={`relative overflow-hidden rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-blue-500 to-blue-600'} p-8 text-white`}>
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative z-10">
@@ -182,18 +214,6 @@ export function EmergencyContacts() {
             <div>
               <h1 className="text-4xl font-bold mb-2">Emergency Contacts</h1>
               <p className="text-blue-100">Quick access to emergency services and nearby help</p>
-            </div>
-            <div className="relative w-full sm:w-auto">
-              <input
-                type="text"
-                placeholder="Search contacts..."
-                className={`w-full sm:w-64 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                    : 'bg-white bg-opacity-20 border-white border-opacity-30 text-white placeholder-blue-100'
-                }`}
-              />
-              <Search className="absolute left-3 top-3.5 h-5 w-5 text-blue-100" />
             </div>
           </div>
         </div>
@@ -322,8 +342,34 @@ export function EmergencyContacts() {
       {/* Emergency Centers and Tips Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
-            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Nearest Emergency Centers</h2>
+        <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Nearest Emergency Centers</h2>
+              <div className="relative mt-2 sm:mt-0">
+                <input
+                  type="text"
+                  placeholder="Search centers..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className={`w-full sm:w-56 pl-8 pr-8 py-1.5 text-sm rounded-lg focus:outline-none focus:ring-2 ${
+                    isDarkMode 
+                      ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:ring-blue-500' 
+                      : 'bg-white border-gray-200 text-gray-700 placeholder-gray-500 focus:ring-blue-400'
+                  } border`}
+                />
+                <Search className={`absolute left-2.5 top-2 h-4 w-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                {searchTerm && (
+                  <button 
+                    onClick={() => setSearchTerm('')}
+                    className={`absolute right-2.5 top-2 text-xs rounded-full p-0.5 ${
+                      isDarkMode ? 'bg-gray-700 text-gray-300 hover:text-gray-100' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    }`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
           <div className="p-6">
             {loading ? (
@@ -332,8 +378,8 @@ export function EmergencyContacts() {
               </div>
             ) : location ? (
               <div className="space-y-4">
-                {Array.isArray(emergencyCenters) && emergencyCenters.length > 0 ? (
-                  emergencyCenters.map((center, index) => (
+                {Array.isArray(filteredCenters) && filteredCenters.length > 0 ? (
+                  filteredCenters.map((center, index) => (
                     <div key={index} className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl p-4 border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'} hover:border-blue-100 transition-all duration-200`}>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-3">
@@ -392,7 +438,19 @@ export function EmergencyContacts() {
                     </div>
                   ))
                 ) : (
-                  <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>No emergency centers found nearby</p>
+                  <div className="text-center py-8">
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
+                      {searchTerm ? 'No emergency centers match your search' : 'No emergency centers found nearby'}
+                    </p>
+                    {searchTerm && (
+                      <button 
+                        onClick={() => setSearchTerm('')}
+                        className={`text-sm ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} hover:underline`}
+                      >
+                        Clear search
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (

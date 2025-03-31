@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import routes from './routes/routes.js';
 import connectDB from './config/connect.js';
-import mongoose from 'mongoose';
 import emergencyRoutes from './routes/emergency.js';
 import volunteerRoutes from './routes/volunteers.js';
+import emailRoutes from './routes/emailRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -18,13 +18,12 @@ app.use(express.json());
 app.use('/api', routes);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODBURL)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+connectDB(process.env.MONGODBURL);
 
 // Routes
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/volunteers',volunteerRoutes);
+app.use('/api/email',emailRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
