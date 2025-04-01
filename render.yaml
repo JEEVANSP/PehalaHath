@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pehlahath-frontend
+    env: node
+    buildCommand: cd frontend1 && npm install
+    startCommand: cd frontend1 && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: https://pehlahath-backend.onrender.com 
