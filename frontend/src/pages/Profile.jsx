@@ -36,11 +36,13 @@ export function Profile() {
 
   const fetchUserProfile = async () => {
     try {
+      console.log("Fetching profile with token:", user?.token); // Debug log
       const response = await axios.get(`${BACKEND_URL}/profile`, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },
       });
+      console.log("Profile response:", response.data); // Debug log
       if (response.data) {
         setProfileData({
           name: response.data.name || "",
@@ -59,8 +61,16 @@ export function Profile() {
         });
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile information");
+      console.error("Error fetching profile:", error.response || error);
+
+      // If unauthorized, clear token and redirect to login
+      if (error.response && error.response.status === 401) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      } else {
+        toast.error("Failed to load profile information");
+      }
     }
   };
 
