@@ -2,6 +2,7 @@ services:
   - type: web
     name: pehlahath-frontend
     env: node
+    nodeVersion: 18.17.0
     buildCommand: cd frontend && npm install && npm run build
     startCommand: cd frontend && npm run preview
     envVars:
