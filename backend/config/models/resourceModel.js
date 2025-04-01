@@ -54,6 +54,9 @@ const resourceSchema = new mongoose.Schema({
     role: {
       type: String,
       required: true
+    },
+    phone: {
+      type: String,
     }
   },
   timestamp: {

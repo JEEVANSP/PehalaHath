@@ -3,7 +3,9 @@ import {
   getAllResources,
   createResourceRequest,
   updateResourceStatus,
-  getUserResourceRequests
+  getUserResourceRequests,
+  updateResourceAllocation,
+  deleteAllocatedResource
 } from '../controllers/auth/resourceController.js';
 
 const router = express.Router();
@@ -17,7 +19,12 @@ router.post('/resources', createResourceRequest);
 // Update resource status
 router.patch('/resources/:id', updateResourceStatus);
 
+// Mark resource as allocated
+router.patch('/resources/:userId/:resourceId/allocate', updateResourceAllocation);
+
 // Get user's resource requests
 router.get('/resources/user/:userId', getUserResourceRequests);
 
-export default router; 
+router.delete('/resources/:userId/:resourceId',deleteAllocatedResource)
+
+export default router;
